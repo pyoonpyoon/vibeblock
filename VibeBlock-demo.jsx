@@ -1912,7 +1912,9 @@ function DeployPanel({ demoType }) {
 
       setPhase("done");
     } catch(e) {
-      setErrMsg(friendlyErr(e?.message || String(e)));
+      const raw = e?.message || String(e);
+      console.error("[SHIP]", e);
+      setErrMsg(raw.slice(0, 300));
       setPhase("idle");
     }
   }
