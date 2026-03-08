@@ -183,12 +183,8 @@ function Slide3() {
     { num: "03", label: "Refine and ship", detail: "Working foundation · Refine with AI · Deploy on your timeline", color: T.green, highlight: false },
   ];
 
-  const demoCards = [
-    { emoji: "⚡", title: "Trading Bot", color: "#f59e0b" },
-    { emoji: "🤝", title: "Freelancer Escrow", color: "#0EA5E9" },
-    { emoji: "🎮", title: "Play-to-Earn Game", color: "#a855f7" },
-    { emoji: "🛍️", title: "P2P Marketplace", color: "#00C805" },
-  ];
+  const C = 18; // corner bracket size
+  const CW = 2; // corner bracket weight
 
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "24px 64px 20px" }}>
@@ -196,10 +192,10 @@ function Slide3() {
         The Solution
       </div>
 
-      <div style={{ display: "flex", gap: 32, flex: 1, alignItems: "stretch", minHeight: 0, marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 40, flex: 1, minHeight: 0, marginBottom: 14 }}>
 
-        {/* Left: 3-step cards stacked */}
-        <div style={{ flex: "0 0 38%", display: "flex", flexDirection: "column", gap: 0 }}>
+        {/* Left: 3-step cards — vertically centered */}
+        <div style={{ flex: "0 0 36%", display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>
           {cards.map((card, i) => (
             <div key={card.num}>
               <div style={{
@@ -217,77 +213,34 @@ function Slide3() {
               )}
             </div>
           ))}
-
-          <div style={{ marginTop: "auto", paddingTop: 14 }}>
-            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, lineHeight: 1.4 }}>
+          <div style={{ marginTop: 20 }}>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 17, lineHeight: 1.5 }}>
               <span style={{ color: T.green }}>User sees: an app.</span>
               <br />
-              <span style={{ color: T.muted, fontSize: 15 }}>Nobody sees: the blockchain.</span>
+              <span style={{ color: T.muted, fontSize: 14 }}>Nobody sees: the blockchain.</span>
             </div>
           </div>
         </div>
 
-        {/* Right: Browser frame mockup */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", border: `1px solid ${T.border}`, borderRadius: 16, overflow: "hidden", minHeight: 0 }}>
-          {/* Browser chrome */}
-          <div style={{ background: "#0d1117", padding: "8px 14px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${T.border}`, flexShrink: 0 }}>
-            {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />)}
-            <div style={{ flex: 1, background: "#1a1f2e", borderRadius: 5, padding: "3px 10px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", textAlign: "center" }}>
-              vibeblock.vercel.app
-            </div>
-          </div>
+        {/* Right: actual screenshot with corner brackets — vertically centered */}
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0 }}>
+          <div style={{ position: "relative", width: "100%", maxHeight: "100%" }}>
 
-          {/* App content */}
-          <div style={{ flex: 1, background: "#000", overflow: "hidden", position: "relative", fontFamily: "'DM Mono',monospace" }}>
-            {/* Grid */}
-            <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(rgba(30,45,74,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(30,45,74,0.3) 1px,transparent 1px)`, backgroundSize: "32px 32px", pointerEvents: "none" }} />
+            {/* Corner brackets */}
+            <div style={{ position: "absolute", top: -6, left: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+            <div style={{ position: "absolute", top: -6, right: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+            <div style={{ position: "absolute", bottom: -6, left: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+            <div style={{ position: "absolute", bottom: -6, right: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
 
-            {/* Nav */}
-            <div style={{ position: "relative", display: "flex", alignItems: "center", padding: "10px 20px", borderBottom: `1px solid ${T.border}`, background: "rgba(0,0,0,0.8)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 16, height: 16, background: T.accent, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <div style={{ width: 6, height: 6, background: "#000", borderRadius: 1 }} />
-                </div>
-                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 10, color: "#fff", letterSpacing: "0.08em" }}>VIBEBLOCK</span>
-              </div>
-              <div style={{ display: "flex", gap: 12, marginLeft: 16 }}>
-                {["Build", "Examples", "Docs"].map(l => <span key={l} style={{ fontSize: 9, color: "#375280" }}>{l}</span>)}
-              </div>
-              <div style={{ flex: 1 }} />
-              <div style={{ display: "flex", gap: 8 }}>
-                {["Arbitrum","LayerZero","Fhenix"].map(l => <span key={l} style={{ fontSize: 8, color: "#375280" }}>{l}</span>)}
-              </div>
-            </div>
+            {/* Subtle glow behind image */}
+            <div style={{ position: "absolute", inset: -1, borderRadius: 12, boxShadow: `0 0 40px ${T.accent}18, 0 0 0 1px ${T.border}`, pointerEvents: "none", zIndex: 1 }} />
 
-            {/* Hero */}
-            <div style={{ position: "relative", textAlign: "center", padding: "20px 24px 14px" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(18,170,255,0.08)", border: "1px solid rgba(18,170,255,0.2)", borderRadius: 12, padding: "3px 10px", marginBottom: 10 }}>
-                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#00C805", display: "inline-block" }} />
-                <span style={{ fontSize: 7, color: T.accent, fontWeight: 700, letterSpacing: "0.1em" }}>BUILD ANYTHING · RUNS EVERYWHERE · NOBODY SEES THE BLOCKCHAIN</span>
-              </div>
-              <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 22, lineHeight: 1.1, marginBottom: 8 }}>
-                <div style={{ color: "#fff" }}>Build anything.</div>
-                <div style={{ color: T.accent }}>Runs everywhere.</div>
-              </div>
-              <div style={{ fontSize: 9, color: "#375280", maxWidth: 340, margin: "0 auto 12px", lineHeight: 1.6 }}>
-                Describe any product. Get a complete, deployed app your users can access from any chain, any device, any country.
-              </div>
-              {/* Prompt bar */}
-              <div style={{ background: "#0d1626", border: `1px solid ${T.border}`, borderRadius: 8, padding: "7px 12px", display: "flex", alignItems: "center", gap: 8, maxWidth: 380, margin: "0 auto 14px", textAlign: "left" }}>
-                <span style={{ fontSize: 8, color: "#375280", flex: 1 }}>Describe your product idea...</span>
-                <div style={{ background: T.accent, borderRadius: 5, padding: "3px 8px", fontSize: 8, color: "#000", fontWeight: 700, whiteSpace: "nowrap" }}>Build on Arbitrum →</div>
-              </div>
-              {/* Demo cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, maxWidth: 380, margin: "0 auto" }}>
-                {demoCards.map(d => (
-                  <div key={d.title} style={{ background: "#0d1626", border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", textAlign: "left", display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 12 }}>{d.emoji}</span>
-                    <span style={{ fontSize: 8, color: "#c8d8f0", fontWeight: 500 }}>{d.title}</span>
-                    <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Screenshot */}
+            <img
+              src="/vb-screenshot-light.png"
+              alt="VibeBlock front page"
+              style={{ width: "100%", display: "block", borderRadius: 10, objectFit: "cover", objectPosition: "top" }}
+            />
           </div>
         </div>
 
