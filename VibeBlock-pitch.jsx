@@ -178,66 +178,122 @@ function Slide2() {
 
 function Slide3() {
   const cards = [
-    {
-      num: "01",
-      label: "Bring your idea",
-      detail: "Rough prompt, PRD, or product description — any format, any stage of thinking",
-      color: T.muted,
-      highlight: false,
-    },
-    {
-      num: "02",
-      label: "VibeBlock scaffolds",
-      detail: "Production-grade contract · Frontend foundation · Security audit baseline · Deploy pipeline",
-      color: T.accent,
-      highlight: true,
-    },
-    {
-      num: "03",
-      label: "Refine and ship",
-      detail: "Working foundation to build on · Refine with AI · Deploy on your timeline",
-      color: T.green,
-      highlight: false,
-    },
+    { num: "01", label: "Bring your idea", detail: "Rough prompt, PRD, or description — any format, any stage", color: T.muted, highlight: false },
+    { num: "02", label: "VibeBlock scaffolds", detail: "Contract · Frontend · Security audit · Deploy pipeline", color: T.accent, highlight: true },
+    { num: "03", label: "Refine and ship", detail: "Working foundation · Refine with AI · Deploy on your timeline", color: T.green, highlight: false },
+  ];
+
+  const demoCards = [
+    { emoji: "⚡", title: "Trading Bot", color: "#f59e0b" },
+    { emoji: "🤝", title: "Freelancer Escrow", color: "#0EA5E9" },
+    { emoji: "🎮", title: "Play-to-Earn Game", color: "#a855f7" },
+    { emoji: "🛍️", title: "P2P Marketplace", color: "#00C805" },
   ];
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 72px" }}>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 40 }}>
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "24px 64px 20px" }}>
+      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 20, flexShrink: 0 }}>
         The Solution
       </div>
-      <div style={{ display: "flex", flexDirection: "row", gap: 32, width: "100%", alignItems: "stretch", marginBottom: 48 }}>
-        {cards.map((card, i) => (
-          <span key={card.num} style={{ display: "contents" }}>
-            <div style={{
-              flex: 1,
-              background: card.highlight ? `${T.accent}0d` : T.surface,
-              border: `1px solid ${card.highlight ? T.accent : T.border}`,
-              borderRadius: 20, padding: "52px 48px",
-              display: "flex", flexDirection: "column",
-            }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 16, color: card.color, letterSpacing: "0.15em", marginBottom: 22, textTransform: "uppercase" }}>
-                {card.num}
+
+      <div style={{ display: "flex", gap: 32, flex: 1, alignItems: "stretch", minHeight: 0, marginBottom: 14 }}>
+
+        {/* Left: 3-step cards stacked */}
+        <div style={{ flex: "0 0 38%", display: "flex", flexDirection: "column", gap: 0 }}>
+          {cards.map((card, i) => (
+            <div key={card.num}>
+              <div style={{
+                background: card.highlight ? `${T.accent}0d` : T.surface,
+                border: `1px solid ${card.highlight ? T.accent : T.border}`,
+                borderRadius: 16, padding: "20px 24px",
+                display: "flex", flexDirection: "column",
+              }}>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: card.color, letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>{card.num}</div>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 22, color: T.text, marginBottom: 6, lineHeight: 1.2 }}>{card.label}</div>
+                <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{card.detail}</div>
               </div>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 36, color: T.text, marginBottom: 22, lineHeight: 1.15 }}>
-                {card.label}
+              {i < cards.length - 1 && (
+                <div style={{ fontSize: 20, color: T.muted, textAlign: "center", padding: "6px 0" }}>↓</div>
+              )}
+            </div>
+          ))}
+
+          <div style={{ marginTop: "auto", paddingTop: 14 }}>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, lineHeight: 1.4 }}>
+              <span style={{ color: T.green }}>User sees: an app.</span>
+              <br />
+              <span style={{ color: T.muted, fontSize: 15 }}>Nobody sees: the blockchain.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Browser frame mockup */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", border: `1px solid ${T.border}`, borderRadius: 16, overflow: "hidden", minHeight: 0 }}>
+          {/* Browser chrome */}
+          <div style={{ background: "#0d1117", padding: "8px 14px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${T.border}`, flexShrink: 0 }}>
+            {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />)}
+            <div style={{ flex: 1, background: "#1a1f2e", borderRadius: 5, padding: "3px 10px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", textAlign: "center" }}>
+              vibeblock.vercel.app
+            </div>
+          </div>
+
+          {/* App content */}
+          <div style={{ flex: 1, background: "#000", overflow: "hidden", position: "relative", fontFamily: "'DM Mono',monospace" }}>
+            {/* Grid */}
+            <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(rgba(30,45,74,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(30,45,74,0.3) 1px,transparent 1px)`, backgroundSize: "32px 32px", pointerEvents: "none" }} />
+
+            {/* Nav */}
+            <div style={{ position: "relative", display: "flex", alignItems: "center", padding: "10px 20px", borderBottom: `1px solid ${T.border}`, background: "rgba(0,0,0,0.8)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 16, height: 16, background: T.accent, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 6, height: 6, background: "#000", borderRadius: 1 }} />
+                </div>
+                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 10, color: "#fff", letterSpacing: "0.08em" }}>VIBEBLOCK</span>
               </div>
-              <div style={{ fontSize: 21, color: T.muted, lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-                {card.detail}
+              <div style={{ display: "flex", gap: 12, marginLeft: 16 }}>
+                {["Build", "Examples", "Docs"].map(l => <span key={l} style={{ fontSize: 9, color: "#375280" }}>{l}</span>)}
+              </div>
+              <div style={{ flex: 1 }} />
+              <div style={{ display: "flex", gap: 8 }}>
+                {["Arbitrum","LayerZero","Fhenix"].map(l => <span key={l} style={{ fontSize: 8, color: "#375280" }}>{l}</span>)}
               </div>
             </div>
-            {i < cards.length - 1 && (
-              <div style={{ fontSize: 40, color: T.muted, display: "flex", alignItems: "center", flexShrink: 0 }}>→</div>
-            )}
-          </span>
-        ))}
+
+            {/* Hero */}
+            <div style={{ position: "relative", textAlign: "center", padding: "20px 24px 14px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(18,170,255,0.08)", border: "1px solid rgba(18,170,255,0.2)", borderRadius: 12, padding: "3px 10px", marginBottom: 10 }}>
+                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#00C805", display: "inline-block" }} />
+                <span style={{ fontSize: 7, color: T.accent, fontWeight: 700, letterSpacing: "0.1em" }}>BUILD ANYTHING · RUNS EVERYWHERE · NOBODY SEES THE BLOCKCHAIN</span>
+              </div>
+              <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 22, lineHeight: 1.1, marginBottom: 8 }}>
+                <div style={{ color: "#fff" }}>Build anything.</div>
+                <div style={{ color: T.accent }}>Runs everywhere.</div>
+              </div>
+              <div style={{ fontSize: 9, color: "#375280", maxWidth: 340, margin: "0 auto 12px", lineHeight: 1.6 }}>
+                Describe any product. Get a complete, deployed app your users can access from any chain, any device, any country.
+              </div>
+              {/* Prompt bar */}
+              <div style={{ background: "#0d1626", border: `1px solid ${T.border}`, borderRadius: 8, padding: "7px 12px", display: "flex", alignItems: "center", gap: 8, maxWidth: 380, margin: "0 auto 14px", textAlign: "left" }}>
+                <span style={{ fontSize: 8, color: "#375280", flex: 1 }}>Describe your product idea...</span>
+                <div style={{ background: T.accent, borderRadius: 5, padding: "3px 8px", fontSize: 8, color: "#000", fontWeight: 700, whiteSpace: "nowrap" }}>Build on Arbitrum →</div>
+              </div>
+              {/* Demo cards */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, maxWidth: 380, margin: "0 auto" }}>
+                {demoCards.map(d => (
+                  <div key={d.title} style={{ background: "#0d1626", border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", textAlign: "left", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12 }}>{d.emoji}</span>
+                    <span style={{ fontSize: 8, color: "#c8d8f0", fontWeight: 500 }}>{d.title}</span>
+                    <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "clamp(24px, 3vw, 40px)", textAlign: "center", lineHeight: 1.3, marginBottom: 16 }}>
-        <span style={{ color: T.green }}>User sees: an app.</span>
-        {"  "}
-        <span style={{ color: T.muted }}>Nobody sees: the blockchain.</span>
-      </div>
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: T.muted, textAlign: "center" }}>
+
+      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.muted, flexShrink: 0 }}>
         Not magic — months of blockchain infrastructure, eliminated from day one.{" "}
         <span style={{ color: T.text, fontWeight: 500 }}>The product iteration is still yours.</span>
       </div>
@@ -520,27 +576,27 @@ function Slide6() {
         </div>
 
         {/* Right: CLI */}
-        <div style={{ flex: 1, background: "#080c08", border: "1px solid #1a2e1a", borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, background: "#000000", border: "1px solid #1e2d4a", borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           {/* Terminal chrome */}
-          <div style={{ background: "#0a120a", padding: "10px 16px", display: "flex", alignItems: "center", gap: 7, borderBottom: "1px solid #1a2e1a", flexShrink: 0 }}>
+          <div style={{ background: "#000000", padding: "10px 16px", display: "flex", alignItems: "center", gap: 7, borderBottom: "1px solid #1e2d4a", flexShrink: 0 }}>
             {["#ff5f57","#febc2e","#28c840"].map(c => (
               <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />
             ))}
-            <div style={{ flex: 1, textAlign: "center", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#3a5a3a" }}>vibeblock — zsh</div>
+            <div style={{ flex: 1, textAlign: "center", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#375280" }}>vibeblock — zsh</div>
           </div>
 
           {/* Model selector row */}
-          <div style={{ padding: "12px 16px 10px", display: "flex", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #0d1a0d", flexShrink: 0 }}>
+          <div style={{ padding: "12px 16px 10px", display: "flex", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #1e2d4a", flexShrink: 0 }}>
             {cliModels.map(m => (
               <div key={m.label} style={{
-                background: m.active ? "#00C80520" : "transparent",
-                border: `1px solid ${m.active ? "#00C80566" : "#1a2e1a"}`,
+                background: m.active ? "#12AAFF20" : "transparent",
+                border: `1px solid ${m.active ? "#12AAFF66" : "#1e2d4a"}`,
                 borderRadius: 6, padding: "3px 10px",
                 fontFamily: "'DM Mono', monospace", fontSize: 10,
-                color: m.active ? "#00C805" : "#3a5a3a",
+                color: m.active ? "#12AAFF" : "#375280",
               }}>{m.label}</div>
             ))}
-            <div style={{ border: "1px dashed #1a2e1a", borderRadius: 6, padding: "3px 10px", fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#2a3a2a" }}>
+            <div style={{ border: "1px dashed #1e2d4a", borderRadius: 6, padding: "3px 10px", fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#375280" }}>
               + Add Model
             </div>
           </div>
@@ -549,16 +605,16 @@ function Slide6() {
           <div style={{ flex: 1, padding: "14px 18px", fontFamily: "'DM Mono', monospace", fontSize: 12, lineHeight: 1.85, overflow: "hidden" }}>
             <div style={{ color: "#e8eaf0" }}>$ vibeblock generate "DeFi yield optimizer"</div>
             <div style={{ color: "#e8eaf0", paddingLeft: 2 }}>{"  "}--model claude-code --deploy arbitrum-one</div>
-            <div style={{ color: "#3a4a5a", marginTop: 8 }}>{"  "}┌─ VibeBlock CLI v1.0.0 ──────────────┐</div>
-            <div style={{ color: "#3a4a5a" }}>{"  "}│  Model  : Claude Code (Anthropic)   │</div>
-            <div style={{ color: "#3a4a5a" }}>{"  "}└──────────────────────────────────────┘</div>
-            <div style={{ color: "#00C805", marginTop: 10 }}>{"  "}✓ Contract deployed: 0x7fA3...c291</div>
-            <div style={{ color: "#00C805" }}>{"  "}✓ Gas: $0.00 — Paymaster sponsored</div>
-            <div style={{ color: "#00C805" }}>{"  "}✓ Done in 9.2s</div>
+            <div style={{ color: "#1e2d4a", marginTop: 8 }}>{"  "}┌─ VibeBlock CLI v1.0.0 ──────────────┐</div>
+            <div style={{ color: "#1e2d4a" }}>{"  "}│  Model  : Claude Code (Anthropic)   │</div>
+            <div style={{ color: "#1e2d4a" }}>{"  "}└──────────────────────────────────────┘</div>
+            <div style={{ color: "#12AAFF", marginTop: 10 }}>{"  "}✓ Contract deployed: 0x7fA3...c291</div>
+            <div style={{ color: "#12AAFF" }}>{"  "}✓ Gas: $0.00 — Paymaster sponsored</div>
+            <div style={{ color: "#12AAFF" }}>{"  "}✓ Done in 9.2s</div>
           </div>
 
           {/* Footer note */}
-          <div style={{ padding: "10px 18px", borderTop: "1px solid #0d1a0d", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#2a4a2a", flexShrink: 0 }}>
+          <div style={{ padding: "10px 18px", borderTop: "1px solid #1e2d4a", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#375280", flexShrink: 0 }}>
             Bring your own API key. Any model. Same Arbitrum result.
           </div>
         </div>
