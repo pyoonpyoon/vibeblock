@@ -1861,6 +1861,7 @@ function DeployPanel({ demoType }) {
         passkeyName: "VibeBlock",
         passkeyServerUrl: PASSKEY_SERVER,
         mode: WebAuthnMode.Register,
+        rpId: window.location.hostname,
       });
 
       const passkeyValidator = await toPasskeyValidator(publicClient, {
