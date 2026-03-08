@@ -2430,8 +2430,11 @@ function CliPanel({ onClose }) {
   const [activeTab, setActiveTab] = useState("terminal");
   const [activeActivity, setActiveActivity] = useState("explorer");
   const [activeSession, setActiveSession] = useState("vibeblock");
+  const [panelHeight, setPanelHeight] = useState(() => Math.round(window.innerHeight * 0.52));
+  const [sidebarWidth, setSidebarWidth] = useState(148);
   const bottomRef = useRef(null);
   const modelRef = useRef(null);
+  const dragState = useRef(null);
 
   const allModels = [...CLI_MODELS, ...customModels];
   const isDone = connected && !running && visibleLines >= CLI_LINES.length;
@@ -2445,6 +2448,45 @@ function CliPanel({ onClose }) {
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }, [visibleLines]);
+
+  // Drag-to-resize for panel height and sidebar width
+  useEffect(() => {
+    const onMove = (e) => {
+      const d = dragState.current;
+      if (!d) return;
+      if (d.type === "panel") {
+        const newH = Math.max(120, Math.min(window.innerHeight * 0.9, d.startH + (d.startY - e.clientY)));
+        setPanelHeight(Math.round(newH));
+      } else {
+        const newW = Math.max(0, Math.min(320, d.startW + (d.startX - e.clientX)));
+        setSidebarWidth(newW < 48 ? 0 : Math.round(newW));
+      }
+    };
+    const onUp = () => {
+      if (!dragState.current) return;
+      // snap sidebar back to default if dragged to 0
+      dragState.current = null;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => { document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
+  }, []);
+
+  const startPanelDrag = (e) => {
+    e.preventDefault();
+    dragState.current = { type: "panel", startY: e.clientY, startH: panelHeight };
+    document.body.style.cursor = "row-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  const startSidebarDrag = (e) => {
+    e.preventDefault();
+    dragState.current = { type: "sidebar", startX: e.clientX, startW: sidebarWidth || 148 };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
 
   const connect = () => {
     if (!selectedModel || !apiKey.trim()) return;
@@ -2541,10 +2583,10 @@ function CliPanel({ onClose }) {
   return (
     <div style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
-      height: "52vh", zIndex: 300,
+      height: panelHeight, zIndex: 300,
       background: "#000000",
       borderTop: "1px solid #1e2d4a",
-      boxShadow: "0 -16px 64px rgba(0,200,5,0.08)",
+      boxShadow: "0 -16px 64px rgba(18,170,255,0.06)",
       display: "flex", flexDirection: "column",
       animation: "cliSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
     }}>
@@ -2552,7 +2594,20 @@ function CliPanel({ onClose }) {
         @keyframes cliSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes cliBlink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes vscProgress { 0%{left:-35%;width:35%} 60%{left:60%;width:35%} 100%{left:100%;width:10%} }
+        .cli-drag-top:hover { background: #12AAFF55 !important; }
+        .cli-drag-side:hover::before { opacity: 1 !important; }
       `}</style>
+
+      {/* ── Top drag handle ─────────────────────────────────────────────── */}
+      <div
+        className="cli-drag-top"
+        onMouseDown={startPanelDrag}
+        style={{
+          height: 4, flexShrink: 0, cursor: "row-resize",
+          background: "transparent", transition: "background 0.15s",
+          position: "relative", zIndex: 10,
+        }}
+      />
 
       {/* Progress bar — 2px sweep while running */}
       <div style={{ height: 2, background: "#0d1626", position: "relative", overflow: "hidden", flexShrink: 0 }}>
@@ -2766,35 +2821,55 @@ function CliPanel({ onClose }) {
 
             {/* ── Terminal Instances Sidebar ──────────────────────────── */}
             <div style={{
-              width: 148, flexShrink: 0,
-              borderLeft: "1px solid #1e2d4a",
+              width: sidebarWidth, flexShrink: 0,
               background: "#000000",
-              display: "flex", flexDirection: "column",
-              overflowY: "auto",
+              display: "flex", flexDirection: "row",
+              overflow: "hidden",
+              transition: sidebarWidth === 0 ? "width 0.15s ease" : "none",
             }}>
-              {[
-                { id: "vibeblock", name: "vibeblock — zsh",  active: true },
-                { id: "node",      name: "node",              active: false },
-              ].map(sess => (
-                <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  padding: "8px 10px",
-                  background: activeSession === sess.id ? "#1e2d4a" : "none",
-                  border: "none",
-                  borderLeft: `2px solid ${activeSession === sess.id ? "#12AAFF" : "transparent"}`,
-                  cursor: "pointer", textAlign: "left", width: "100%",
-                }}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#12AAFF" : "#375280"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="1" y="1" width="14" height="14" rx="2"/>
-                    <polyline points="4,5 7,8 4,11"/><line x1="8" y1="11" x2="12" y2="11"/>
-                  </svg>
-                  <span style={{
-                    fontFamily: "'DM Mono',monospace", fontSize: 11,
-                    color: activeSession === sess.id ? "#c8d0d8" : "#375280",
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>{sess.name}</span>
-                </button>
-              ))}
+              {/* Left drag handle */}
+              <div
+                onMouseDown={startSidebarDrag}
+                onDoubleClick={() => setSidebarWidth(w => w === 0 ? 148 : 0)}
+                style={{
+                  width: 4, flexShrink: 0, cursor: "col-resize",
+                  background: "transparent", position: "relative",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "#12AAFF55"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              />
+              {/* Session list — hidden when collapsed */}
+              <div style={{
+                flex: 1, overflowY: "auto", overflowX: "hidden",
+                borderLeft: "1px solid #1e2d4a",
+                opacity: sidebarWidth < 48 ? 0 : 1,
+                transition: "opacity 0.1s",
+              }}>
+                {[
+                  { id: "vibeblock", name: "vibeblock — zsh" },
+                  { id: "node",      name: "node" },
+                ].map(sess => (
+                  <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "8px 10px",
+                    background: activeSession === sess.id ? "#1e2d4a" : "none",
+                    border: "none",
+                    borderLeft: `2px solid ${activeSession === sess.id ? "#12AAFF" : "transparent"}`,
+                    cursor: "pointer", textAlign: "left", width: "100%",
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#12AAFF" : "#375280"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="1" width="14" height="14" rx="2"/>
+                      <polyline points="4,5 7,8 4,11"/><line x1="8" y1="11" x2="12" y2="11"/>
+                    </svg>
+                    <span style={{
+                      fontFamily: "'DM Mono',monospace", fontSize: 11,
+                      color: activeSession === sess.id ? "#c8d0d8" : "#375280",
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>{sess.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
           </div>
