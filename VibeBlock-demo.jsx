@@ -2542,8 +2542,8 @@ function CliPanel({ onClose }) {
     <div style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
       height: "52vh", zIndex: 300,
-      background: "#080c08",
-      borderTop: "1px solid #1a2e1a",
+      background: "#0b0e19",
+      borderTop: "1px solid #1e2d4a",
       boxShadow: "0 -16px 64px rgba(0,200,5,0.08)",
       display: "flex", flexDirection: "column",
       animation: "cliSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
@@ -2555,8 +2555,8 @@ function CliPanel({ onClose }) {
       `}</style>
 
       {/* Progress bar — 2px sweep while running */}
-      <div style={{ height: 2, background: "#0d1a0d", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-        {running && <div style={{ position: "absolute", top: 0, height: "100%", background: "#00C805", animation: "vscProgress 1.4s ease-in-out infinite" }} />}
+      <div style={{ height: 2, background: "#0d1626", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+        {running && <div style={{ position: "absolute", top: 0, height: "100%", background: "#12AAFF", animation: "vscProgress 1.4s ease-in-out infinite" }} />}
       </div>
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
@@ -2564,8 +2564,8 @@ function CliPanel({ onClose }) {
         {/* ── Activity Bar ─────────────────────────────────────────────── */}
         <div style={{
           width: 44, flexShrink: 0,
-          background: "#060c06",
-          borderRight: "1px solid #1a2e1a",
+          background: "#080b14",
+          borderRight: "1px solid #1e2d4a",
           display: "flex", flexDirection: "column",
           alignItems: "center", paddingTop: 6, gap: 2,
         }}>
@@ -2574,8 +2574,8 @@ function CliPanel({ onClose }) {
               width: 44, height: 44,
               display: "flex", alignItems: "center", justifyContent: "center",
               background: "none", border: "none",
-              borderLeft: `2px solid ${activeActivity === act.id ? "#00C805" : "transparent"}`,
-              color: activeActivity === act.id ? "#c8d0d8" : "#3a5a3a",
+              borderLeft: `2px solid ${activeActivity === act.id ? "#12AAFF" : "transparent"}`,
+              color: activeActivity === act.id ? "#c8d0d8" : "#375280",
               cursor: "pointer", transition: "color 0.15s",
             }}>{act.icon}</button>
           ))}
@@ -2587,8 +2587,8 @@ function CliPanel({ onClose }) {
           {/* Tab strip + controls */}
           <div style={{
             display: "flex", alignItems: "center",
-            background: "#060c06",
-            borderBottom: "1px solid #1a2e1a",
+            background: "#080b14",
+            borderBottom: "1px solid #1e2d4a",
             flexShrink: 0, flexWrap: "wrap",
           }}>
             {/* Traffic lights */}
@@ -2603,10 +2603,10 @@ function CliPanel({ onClose }) {
               {panelTabs.map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
                   background: "none", border: "none",
-                  borderBottom: `2px solid ${activeTab === tab.id ? "#00C805" : "transparent"}`,
+                  borderBottom: `2px solid ${activeTab === tab.id ? "#12AAFF" : "transparent"}`,
                   padding: "9px 16px 7px",
                   fontFamily: "'DM Mono',monospace", fontSize: 11,
-                  color: activeTab === tab.id ? "#c8d0d8" : "#3a5a3a",
+                  color: activeTab === tab.id ? "#c8d0d8" : "#375280",
                   cursor: "pointer", letterSpacing: "0.08em",
                   display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
                 }}>
@@ -2631,18 +2631,18 @@ function CliPanel({ onClose }) {
                   <input autoFocus value={newModelName} onChange={e => setNewModelName(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") addModel(); if (e.key === "Escape") { setAddingModel(false); setNewModelName(""); } }}
                     placeholder="model name..."
-                    style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 160, outline: "none" }} />
+                    style={{ background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 160, outline: "none" }} />
                   <button onClick={addModel} style={{ background: "#00C80520", border: "1px solid #00C80566", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#00C805", cursor: "pointer" }}>add</button>
-                  <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>cancel</button>
+                  <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#375280", cursor: "pointer" }}>cancel</button>
                 </div>
               ) : (
                 <div ref={modelRef} style={{ position: "relative" }}>
                   <button onClick={() => !connected && setModelOpen(o => !o)} style={{
-                    background: selectedModel ? "#00C80510" : "#0d1a0d",
-                    border: `1px solid ${selectedModel ? "#00C80544" : "#1a2e1a"}`,
+                    background: selectedModel ? "#00C80510" : "#0d1626",
+                    border: `1px solid ${selectedModel ? "#00C80544" : "#1e2d4a"}`,
                     borderRadius: 6, padding: "4px 12px",
                     fontFamily: "'DM Mono',monospace", fontSize: 11,
-                    color: selectedModel ? "#00C805" : "#3a5a3a",
+                    color: selectedModel ? "#00C805" : "#375280",
                     cursor: connected ? "default" : "pointer",
                     display: "flex", alignItems: "center", gap: 6, minWidth: 130,
                   }}>
@@ -2650,7 +2650,7 @@ function CliPanel({ onClose }) {
                     {!connected && <span style={{ fontSize: 8, opacity: 0.5 }}>{modelOpen ? "▲" : "▼"}</span>}
                   </button>
                   {modelOpen && (
-                    <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: 0, background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 -8px 24px rgba(0,0,0,0.5)" }}>
+                    <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: 0, background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 -8px 24px rgba(0,0,0,0.5)" }}>
                       {allModels.map(m => (
                         <button key={m.id} onClick={() => { setSelectedModel(m); setModelOpen(false); setApiKey(""); setConnected(false); setVisibleLines(0); setRunning(false); }}
                           style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: selectedModel?.id === m.id ? "#00C80512" : "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: selectedModel?.id === m.id ? "#00C805" : "#6b7a99", cursor: "pointer", textAlign: "left" }}>
@@ -2658,9 +2658,9 @@ function CliPanel({ onClose }) {
                           <span style={{ fontSize: 9, opacity: 0.5 }}>{m.tag}</span>
                         </button>
                       ))}
-                      <div style={{ height: 1, background: "#1a2e1a", margin: "4px 0" }} />
+                      <div style={{ height: 1, background: "#1e2d4a", margin: "4px 0" }} />
                       <button onClick={() => { setModelOpen(false); setAddingModel(true); }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#375280", cursor: "pointer" }}>
                         <span>+</span> Add Model
                       </button>
                     </div>
@@ -2680,13 +2680,13 @@ function CliPanel({ onClose }) {
                       onKeyDown={e => { if (e.key === "Enter") connect(); }}
                       placeholder={selectedModel.placeholder}
                       type="password"
-                      style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 180, outline: "none" }} />
+                      style={{ background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 180, outline: "none" }} />
                     <button onClick={connect} disabled={!apiKey.trim()} style={{
                       background: apiKey.trim() ? "#00C80520" : "transparent",
-                      border: `1px solid ${apiKey.trim() ? "#00C80566" : "#1a2e1a"}`,
+                      border: `1px solid ${apiKey.trim() ? "#00C80566" : "#1e2d4a"}`,
                       borderRadius: 6, padding: "4px 16px",
                       fontFamily: "'DM Mono',monospace", fontSize: 11,
-                      color: apiKey.trim() ? "#00C805" : "#3a5a3a",
+                      color: apiKey.trim() ? "#00C805" : "#375280",
                       cursor: apiKey.trim() ? "pointer" : "not-allowed",
                     }}>Connect</button>
                   </div>
@@ -2694,17 +2694,17 @@ function CliPanel({ onClose }) {
               )}
 
               {/* VS Code terminal action buttons */}
-              <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1a2e1a", marginLeft: 4, paddingLeft: 8, gap: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1e2d4a", marginLeft: 4, paddingLeft: 8, gap: 0 }}>
                 {[
                   { title: "New Terminal",   label: "+" },
                   { title: "Launch Profile", label: "∨" },
                   { title: "More Actions",   label: "···" },
                   { title: "Split Terminal", label: "⊟" },
                 ].map(({ title, label }) => (
-                  <button key={title} title={title} style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", padding: "3px 7px", fontSize: 13, lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{label}</button>
+                  <button key={title} title={title} style={{ background: "none", border: "none", color: "#375280", cursor: "pointer", padding: "3px 7px", fontSize: 13, lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{label}</button>
                 ))}
-                <div style={{ width: 1, height: 13, background: "#1a2e1a", margin: "0 6px" }} />
-                <button onClick={onClose} title="Close Panel" style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", padding: "2px 5px", fontSize: 17, lineHeight: 1 }}>×</button>
+                <div style={{ width: 1, height: 13, background: "#1e2d4a", margin: "0 6px" }} />
+                <button onClick={onClose} title="Close Panel" style={{ background: "none", border: "none", color: "#375280", cursor: "pointer", padding: "2px 5px", fontSize: 17, lineHeight: 1 }}>×</button>
               </div>
             </div>
           </div>
@@ -2717,9 +2717,9 @@ function CliPanel({ onClose }) {
 
               {activeTab === "terminal" && (
                 <>
-                  {!selectedModel && <div style={{ color: "#3a5a3a" }}>Select a model to get started.</div>}
+                  {!selectedModel && <div style={{ color: "#375280" }}>Select a model to get started.</div>}
                   {selectedModel && !connected && (
-                    <div style={{ color: "#3a5a3a" }}>
+                    <div style={{ color: "#375280" }}>
                       Enter your {selectedModel.label} API key and press <span style={{ color: "#00C805" }}>Connect</span>.
                     </div>
                   )}
@@ -2737,16 +2737,16 @@ function CliPanel({ onClose }) {
               {activeTab === "problems" && (
                 <div>
                   {problems.length === 0 && (
-                    <div style={{ color: "#3a5a3a" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
+                    <div style={{ color: "#375280" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
                   )}
                   {problems.map((p, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1a2e1a33" }}>
-                      <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a8a6a", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1e2d4a33" }}>
+                      <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a7aaa", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
                         {p.severity === "warning" ? "⚠" : "ℹ"}
                       </span>
                       <div>
                         <div style={{ color: "#c8d0d8", fontSize: 13 }}>{p.message}</div>
-                        <div style={{ color: "#3a5a3a", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
+                        <div style={{ color: "#375280", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
                       </div>
                     </div>
                   ))}
@@ -2755,9 +2755,9 @@ function CliPanel({ onClose }) {
 
               {activeTab === "output" && (
                 <div>
-                  {outputLogs.length === 0 && <div style={{ color: "#3a5a3a" }}>No output yet.</div>}
+                  {outputLogs.length === 0 && <div style={{ color: "#375280" }}>No output yet.</div>}
                   {outputLogs.map((line, i) => (
-                    <div key={i} style={{ color: "#4a6a5a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
+                    <div key={i} style={{ color: "#4a6a9a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
                   ))}
                 </div>
               )}
@@ -2767,8 +2767,8 @@ function CliPanel({ onClose }) {
             {/* ── Terminal Instances Sidebar ──────────────────────────── */}
             <div style={{
               width: 148, flexShrink: 0,
-              borderLeft: "1px solid #1a2e1a",
-              background: "#060c06",
+              borderLeft: "1px solid #1e2d4a",
+              background: "#080b14",
               display: "flex", flexDirection: "column",
               overflowY: "auto",
             }}>
@@ -2779,18 +2779,18 @@ function CliPanel({ onClose }) {
                 <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "8px 10px",
-                  background: activeSession === sess.id ? "#1a2e1a" : "none",
+                  background: activeSession === sess.id ? "#1e2d4a" : "none",
                   border: "none",
-                  borderLeft: `2px solid ${activeSession === sess.id ? "#00C805" : "transparent"}`,
+                  borderLeft: `2px solid ${activeSession === sess.id ? "#12AAFF" : "transparent"}`,
                   cursor: "pointer", textAlign: "left", width: "100%",
                 }}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#00C805" : "#3a5a3a"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#12AAFF" : "#375280"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="1" y="1" width="14" height="14" rx="2"/>
                     <polyline points="4,5 7,8 4,11"/><line x1="8" y1="11" x2="12" y2="11"/>
                   </svg>
                   <span style={{
                     fontFamily: "'DM Mono',monospace", fontSize: 11,
-                    color: activeSession === sess.id ? "#c8d0d8" : "#3a5a3a",
+                    color: activeSession === sess.id ? "#c8d0d8" : "#375280",
                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>{sess.name}</span>
                 </button>
