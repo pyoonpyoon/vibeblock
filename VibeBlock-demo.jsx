@@ -1915,7 +1915,7 @@ function DeployPanel({ demoType }) {
           <button onClick={connect} disabled={phase === "connecting"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "connecting" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "connecting" ? 0.6 : 1 }}>
             {phase === "connecting" ? "Connecting..." : "Connect Wallet"}
           </button>
-          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Wallet required — deploying {d.contract.name} to Arbitrum Sepolia</div>
+          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Wallet required — deploying {d.name} to Arbitrum Sepolia</div>
         </>
       )}
       {(phase === "connected" || phase === "switching" || phase === "deploying") && (
