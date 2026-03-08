@@ -79,14 +79,19 @@ Crypto is invisible to end users. They see dollars and buttons, never wallets or
 - Deployed TradeportEscrow: `0x8c69BF30bc0848cFe7b91489Ab4f9bF7D522e216` on Arbitrum Sepolia
 - ethers imported dynamically: `await import("https://esm.sh/ethers@6")`
 
-## ZeroDev Integration (NEXT TASK — not yet implemented)
-- Goal: replace MetaMask/BrowserProvider with passkey (fingerprint/FaceID) via ZeroDev
+## ZeroDev Integration (IN PROGRESS — branch: feat/zerodev-passkey)
+- Goal: single "SHIP" button → Touch ID fires → contract deploys (gas sponsored, no MetaMask)
 - Project ID: `3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb` (Arbitrum Sepolia, chainId 421614)
 - RPC: `https://rpc.zerodev.app/api/v3/3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb/chain/421614`
 - Passkey Server: `https://passkeys.zerodev.app/api/v3/3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb`
-- Packages needed: `@zerodev/sdk`, `@zerodev/passkey-validator`, `permissionless`, `viem`
-- Flow: "Connect Wallet" → `toWebAuthnKey` → `toPasskeyValidator` → `createKernelAccount` → fingerprint prompt → deploy via bundler (gas sponsored)
-- Replace ~30 lines in `connect()` and `deployContract()` functions
+- Packages installed in preview/: `@zerodev/sdk@5.5.7`, `@zerodev/passkey-validator`, `@zerodev/webauthn-key`, `permissionless`, `viem`, `events`
+- **CRITICAL: Use `virtual:zerodev` module** — static re-export from inside preview/ so Vite resolves ESM correctly. Direct dynamic imports of bare @zerodev/* from VibeBlock-demo.jsx (outside preview/) cause "Class extends undefined" due to CJS/ESM mismatch.
+- **CRITICAL: Parameter is `rpID` (capital ID)**, not `rpId` — `toWebAuthnKey({ rpID: window.location.hostname, ... })`
+- **CRITICAL: `events` polyfill required** — KernelEIP1193Provider imports Node EventEmitter; add `resolve.alias: { events: "events" }` in vite.config.js
+- Entry point: `{ address: "0x0000000071727De22E5E9d8BAf0edAc6f37da032", version: "0.7" }`
+- Kernel version: `KERNEL_V3_1` from `@zerodev/sdk/constants`
+- Last known blocker: cache issue (hard reload Cmd+Shift+R after deploy) — rpID fix was the last real bug; needs a clean test after reload
+- vite.config.js additions needed: `virtualZeroDev()` plugin + `resolve.alias: { events: "events" }` + `dedupe: [..., "viem"]`
 
 ## Vite / Build Notes
 - `resolve: { dedupe: ["react","react-dom"] }` in vite.config.js — required so files outside preview/ can resolve React
