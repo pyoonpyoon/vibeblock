@@ -2430,17 +2430,36 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
   const [activeTab, setActiveTab] = useState("terminal");
   const [activeActivity, setActiveActivity] = useState("explorer");
   const [activeSession, setActiveSession] = useState("vibeblock");
+  const [sessions, setSessions] = useState([
+    { id: "vibeblock", name: "vibeblock — zsh" },
+    { id: "node",      name: "node" },
+  ]);
+  const [openDropdown, setOpenDropdown] = useState(null); // null | "profile" | "more"
+  const [hoveredItem, setHoveredItem] = useState(null);
   // panelHeight is lifted to parent VibeBlock
   const [sidebarWidth, setSidebarWidth] = useState(148);
   const bottomRef = useRef(null);
   const modelRef = useRef(null);
   const dragState = useRef(null);
+  const actionsRef = useRef(null);
 
   const allModels = [...CLI_MODELS, ...customModels];
   const isDone = connected && !running && visibleLines >= CLI_LINES.length;
 
+  const addSession = (type = "zsh") => {
+    const id = `${type}-${Date.now()}`;
+    const name = type === "bash" ? "bash" : type === "node" ? "node" : type === "vibeblock-cli" ? "vibeblock-cli" : `${type} — zsh`;
+    setSessions(prev => [...prev, { id, name }]);
+    setActiveSession(id);
+  };
+
+  const closeDropdown = () => { setOpenDropdown(null); setHoveredItem(null); };
+
   useEffect(() => {
-    const handler = (e) => { if (modelRef.current && !modelRef.current.contains(e.target)) setModelOpen(false); };
+    const handler = (e) => {
+      if (modelRef.current && !modelRef.current.contains(e.target)) setModelOpen(false);
+      if (actionsRef.current && !actionsRef.current.contains(e.target)) closeDropdown();
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -2749,18 +2768,83 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
               )}
 
               {/* VS Code terminal action buttons */}
-              <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1e2d4a", marginLeft: 4, paddingLeft: 8, gap: 0 }}>
-                {[
-                  { title: "New Terminal",   label: "+" },
-                  { title: "Launch Profile", label: "∨" },
-                  { title: "More Actions",   label: "···" },
-                  { title: "Split Terminal", label: "⊟" },
-                ].map(({ title, label }) => (
-                  <button key={title} title={title} style={{ background: "none", border: "none", color: "#375280", cursor: "pointer", padding: "3px 7px", fontSize: 13, lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{label}</button>
-                ))}
-                <div style={{ width: 1, height: 13, background: "#1e2d4a", margin: "0 6px" }} />
-                <button onClick={onClose} title="Close Panel" style={{ background: "none", border: "none", color: "#375280", cursor: "pointer", padding: "2px 5px", fontSize: 17, lineHeight: 1 }}>×</button>
-              </div>
+              {(() => {
+                const Btn = ({ label, title, onClick, active }) => (
+                  <button onClick={onClick} title={title} style={{
+                    background: active ? "#12AAFF22" : "none", border: "none",
+                    color: active ? "#12AAFF" : "#7a90b0", cursor: "pointer",
+                    padding: "3px 8px", fontSize: 13, lineHeight: 1,
+                    fontFamily: "'DM Mono',monospace", borderRadius: 4,
+                    transition: "background 0.12s, color 0.12s",
+                  }}
+                  onMouseEnter={e => { if (!active) { e.currentTarget.style.color = "#c8d0d8"; e.currentTarget.style.background = "#ffffff10"; } }}
+                  onMouseLeave={e => { if (!active) { e.currentTarget.style.color = "#7a90b0"; e.currentTarget.style.background = "none"; } }}
+                  >{label}</button>
+                );
+                const DItem = ({ id, label, shortcut, sub, onClick: act, dim }) => (
+                  <button onMouseDown={e => { e.stopPropagation(); act && act(); }}
+                    onMouseEnter={() => setHoveredItem(id)} onMouseLeave={() => setHoveredItem(null)}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      width: "100%", background: hoveredItem === id ? "#12AAFF18" : "none",
+                      border: "none", padding: "6px 16px", cursor: "pointer",
+                      color: dim ? "#4a6a9a" : "#c8d0d8",
+                      fontFamily: "'DM Sans', sans-serif", fontSize: 13, textAlign: "left",
+                    }}>
+                    <span>{label}</span>
+                    {shortcut && <span style={{ color: "#4a6a9a", fontSize: 11, marginLeft: 32, flexShrink: 0 }}>{shortcut}</span>}
+                    {sub && <span style={{ color: "#4a6a9a", fontSize: 13 }}>›</span>}
+                  </button>
+                );
+                const Divider = () => <div style={{ height: 1, background: "#1e2d4a", margin: "4px 0" }} />;
+                const menuStyle = {
+                  position: "absolute", top: "calc(100% + 6px)", right: 0,
+                  background: "#12151f", border: "1px solid #1e2d4a", borderRadius: 8,
+                  padding: "4px 0", minWidth: 290, zIndex: 700,
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.7)",
+                };
+                return (
+                  <div ref={actionsRef} style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1e2d4a", marginLeft: 4, paddingLeft: 6, gap: 0, position: "relative" }}>
+                    <Btn label="+" title="New Terminal" onClick={() => { addSession("zsh"); }} />
+                    <Btn label="∨" title="Launch Profile" active={openDropdown === "profile"} onClick={() => setOpenDropdown(d => d === "profile" ? null : "profile")} />
+                    <Btn label="···" title="More Actions" active={openDropdown === "more"} onClick={() => setOpenDropdown(d => d === "more" ? null : "more")} />
+                    <Btn label="⊟" title="Split Terminal" onClick={() => addSession("zsh")} />
+                    <div style={{ width: 1, height: 13, background: "#1e2d4a", margin: "0 6px" }} />
+                    <Btn label="×" title="Close Panel" onClick={onClose} />
+
+                    {openDropdown === "profile" && (
+                      <div style={menuStyle}>
+                        <DItem id="new-term"   label="New Terminal"        shortcut="⌃⇧`"  act={() => { addSession("zsh"); closeDropdown(); }} />
+                        <DItem id="new-win"    label="New Terminal Window"  shortcut="⌃⇧⌥`" act={closeDropdown} />
+                        <DItem id="split-term" label="Split Terminal"       shortcut="⌘\\"  act={() => { addSession("zsh"); closeDropdown(); }} />
+                        <Divider />
+                        <DItem id="p-bash" label="bash"               act={() => { addSession("bash"); closeDropdown(); }} />
+                        <DItem id="p-zsh"  label="zsh"                act={() => { addSession("zsh"); closeDropdown(); }} />
+                        <DItem id="p-node" label="node"               act={() => { addSession("node"); closeDropdown(); }} />
+                        <DItem id="p-vb"   label="vibeblock-cli"      act={() => { addSession("vibeblock-cli"); closeDropdown(); }} />
+                        <DItem id="p-split-profile" label="Split Terminal with Profile" sub act={closeDropdown} />
+                        <Divider />
+                        <DItem id="cfg-term" label="Configure Terminal Settings" act={closeDropdown} />
+                        <DItem id="def-prof" label="Select Default Profile"      act={closeDropdown} />
+                      </div>
+                    )}
+
+                    {openDropdown === "more" && (
+                      <div style={menuStyle}>
+                        <DItem id="m-prev"  label="Scroll to Previous Command" shortcut="⌘↑"  act={() => { closeDropdown(); }} />
+                        <DItem id="m-next"  label="Scroll to Next Command"     shortcut="⌘↓"  act={() => { closeDropdown(); }} />
+                        <DItem id="m-clear" label="Clear Terminal"             shortcut="⌘K"  act={() => { setVisibleLines(0); setConnected(false); closeDropdown(); }} />
+                        <DItem id="m-run"   label="Run Active File"                           act={closeDropdown} />
+                        <DItem id="m-sel"   label="Run Selected Text"                         act={closeDropdown} />
+                        <Divider />
+                        <DItem id="m-dir"   label="Go to Recent Directory…"   shortcut="⌘G"  act={closeDropdown} />
+                        <DItem id="m-rcmd"  label="Run Recent Command…"       shortcut="⌃⌥R" act={closeDropdown} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
             </div>
           </div>
 
@@ -2846,10 +2930,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
                 opacity: sidebarWidth < 48 ? 0 : 1,
                 transition: "opacity 0.1s",
               }}>
-                {[
-                  { id: "vibeblock", name: "vibeblock — zsh" },
-                  { id: "node",      name: "node" },
-                ].map(sess => (
+                {sessions.map(sess => (
                   <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "8px 10px",
