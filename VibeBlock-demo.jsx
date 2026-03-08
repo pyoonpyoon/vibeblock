@@ -1835,6 +1835,18 @@ function DeployPanel({ demoType }) {
   const SCAN      = "https://sepolia.arbiscan.io";
   const short     = (a) => a ? `${a.slice(0,6)}...${a.slice(-4)}` : "";
 
+  const friendlyErr = (msg = "") => {
+    if (/max fee per gas|base fee|insufficient funds|gas/i.test(msg))
+      return "Not enough ETH for gas. Get free testnet ETH from the Arbitrum Sepolia faucet, then try again.";
+    if (/user rejected|user denied|rejected the request/i.test(msg))
+      return "Transaction cancelled. Hit Deploy when you're ready to sign.";
+    if (/network|chain|wrong/i.test(msg))
+      return "Wrong network. Switch your wallet to Arbitrum Sepolia and try again.";
+    if (/nonce/i.test(msg))
+      return "Transaction conflict. Reset your wallet's activity data and try again.";
+    return "Something went wrong. Check your wallet is on Arbitrum Sepolia and has ETH, then try again.";
+  };
+
   async function connect() {
     if (!window.ethereum) { setErrMsg("No wallet found. Install a wallet (e.g. Rabby or MetaMask) to deploy."); setPhase("err"); return; }
     setPhase("connecting"); setErrMsg(null);
@@ -1882,7 +1894,7 @@ function DeployPanel({ demoType }) {
       await contract.waitForDeployment();
       setContractAddr(await contract.getAddress());
       setPhase("done");
-    } catch(e) { setErrMsg(e.message?.slice(0, 150) || "Deploy failed"); setPhase("connected"); }
+    } catch(e) { setErrMsg(friendlyErr(e.message)); setPhase("connected"); }
   }
 
   const d = DEPLOY_DATA[demoType] || DEPLOY_DATA.marketplace;
