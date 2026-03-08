@@ -2427,10 +2427,13 @@ function CliPanel({ onClose }) {
   const [connected, setConnected] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
   const [running, setRunning] = useState(false);
+  const [activeTab, setActiveTab] = useState("terminal");
+  const [activeActivity, setActiveActivity] = useState("explorer");
   const bottomRef = useRef(null);
   const modelRef = useRef(null);
 
   const allModels = [...CLI_MODELS, ...customModels];
+  const isDone = connected && !running && visibleLines >= CLI_LINES.length;
 
   useEffect(() => {
     const handler = (e) => { if (modelRef.current && !modelRef.current.contains(e.target)) setModelOpen(false); };
@@ -2447,6 +2450,7 @@ function CliPanel({ onClose }) {
     setConnected(true);
     setVisibleLines(0);
     setRunning(true);
+    setActiveTab("terminal");
     CLI_LINES.forEach((line, i) => { setTimeout(() => setVisibleLines(i + 1), line.delay); });
     setTimeout(() => setRunning(false), CLI_LINES[CLI_LINES.length - 1].delay + 200);
   };
@@ -2479,6 +2483,60 @@ function CliPanel({ onClose }) {
       : l.text,
   }));
 
+  const problems = isDone ? [
+    { severity: "warning", file: "TradeportEscrow.sol", line: 47, col: 5,  message: "Single admin key — consider multisig for fund withdrawal" },
+    { severity: "info",    file: "TradeportEscrow.sol", line: 23, col: 1,  message: "ReentrancyGuard active — nonReentrant on all fund-moving functions" },
+    { severity: "info",    file: "TradeportEscrow.sol", line: 89, col: 3,  message: "Escrow pattern correctly implemented — checks-effects-interactions" },
+  ] : [];
+
+  const outputLogs = isDone ? [
+    "[vibeblock]  Starting generation pipeline...",
+    `[model]      Routing to ${selectedModel?.label || "claude-code"}`,
+    "[analyzer]   Product type → P2P Marketplace",
+    "[compiler]   Solc 0.8.24 → TradeportEscrow.sol (152 lines)",
+    "[slither]    Running 16-pattern static analysis",
+    "[slither]    0 critical  1 medium  2 low",
+    "[ai-audit]   Second-pass review → Grade A  91/100",
+    "[deployer]   Broadcasting to Arbitrum Sepolia (chainId 421614)",
+    "[deployer]   Gas: 312,441 units — sponsored by Paymaster ($0.00 to user)",
+    "[deployer]   Confirmed in block 94,281,003 (250ms)",
+    "[vibeblock]  ✓ Done in 9.2s",
+  ] : [];
+
+  const warningCount = problems.filter(p => p.severity === "warning").length;
+  const infoCount    = problems.filter(p => p.severity === "info").length;
+
+  const ACTIVITY_ICONS = [
+    { id: "explorer", label: "Explorer", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+      </svg>
+    )},
+    { id: "search", label: "Search", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    )},
+    { id: "git", label: "Source Control", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+        <path d="M6 9v6M15.4 6.6L8.6 17.4"/>
+      </svg>
+    )},
+    { id: "extensions", label: "Extensions", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="10" height="10" rx="1"/>
+        <path d="M12 10h3l2-3 2 3v10l-2 3-2-3h-3"/><path d="M12 14h2"/>
+      </svg>
+    )},
+  ];
+
+  const panelTabs = [
+    { id: "terminal", label: "TERMINAL", badge: null },
+    { id: "problems", label: "PROBLEMS", badge: isDone && warningCount > 0 ? warningCount : null },
+    { id: "output",   label: "OUTPUT",   badge: null },
+  ];
+
   return (
     <div style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
@@ -2492,106 +2550,231 @@ function CliPanel({ onClose }) {
       <style>{`
         @keyframes cliSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes cliBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes vscProgress { 0%{left:-35%;width:35%} 60%{left:60%;width:35%} 100%{left:100%;width:10%} }
       `}</style>
 
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", padding: "10px 20px", borderBottom: "1px solid #1a2e1a", gap: 12, flexShrink: 0, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          {["#ff5f57","#febc2e","#28c840"].map(c => (
-            <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
-          ))}
-        </div>
-        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 12, color: "#3a5a3a", letterSpacing: "0.1em" }}>vibeblock — zsh</span>
-        <div style={{ flex: 1 }} />
-
-        {/* Add-model inline input OR model dropdown */}
-        {addingModel ? (
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input autoFocus value={newModelName} onChange={e => setNewModelName(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") addModel(); if (e.key === "Escape") { setAddingModel(false); setNewModelName(""); } }}
-              placeholder="model name..."
-              style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 160, outline: "none" }} />
-            <button onClick={addModel} style={{ background: "#00C80520", border: "1px solid #00C80566", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#00C805", cursor: "pointer" }}>add</button>
-            <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>cancel</button>
-          </div>
-        ) : (
-          <div ref={modelRef} style={{ position: "relative" }}>
-            <button onClick={() => !connected && setModelOpen(o => !o)} style={{
-              background: selectedModel ? "#00C80510" : "#0d1a0d",
-              border: `1px solid ${selectedModel ? "#00C80544" : "#1a2e1a"}`,
-              borderRadius: 6, padding: "4px 12px",
-              fontFamily: "'DM Mono',monospace", fontSize: 11,
-              color: selectedModel ? "#00C805" : "#3a5a3a",
-              cursor: connected ? "default" : "pointer",
-              display: "flex", alignItems: "center", gap: 6, minWidth: 130,
-            }}>
-              {selectedModel ? selectedModel.label : "select model"}
-              {!connected && <span style={{ fontSize: 8, opacity: 0.5 }}>{modelOpen ? "▲" : "▼"}</span>}
-            </button>
-            {modelOpen && (
-              <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: 0, background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 -8px 24px rgba(0,0,0,0.5)" }}>
-                {allModels.map(m => (
-                  <button key={m.id} onClick={() => { setSelectedModel(m); setModelOpen(false); setApiKey(""); setConnected(false); setVisibleLines(0); setRunning(false); }}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: selectedModel?.id === m.id ? "#00C80512" : "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: selectedModel?.id === m.id ? "#00C805" : "#6b7a99", cursor: "pointer", textAlign: "left" }}>
-                    <span>{m.label}</span>
-                    <span style={{ fontSize: 9, opacity: 0.5 }}>{m.tag}</span>
-                  </button>
-                ))}
-                <div style={{ height: 1, background: "#1a2e1a", margin: "4px 0" }} />
-                <button onClick={() => { setModelOpen(false); setAddingModel(true); }}
-                  style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>
-                  <span>+</span> Add Model
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* API key + Connect / Connected badge */}
-        {selectedModel && !addingModel && (
-          connected ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#00C80510", border: "1px solid #00C80533", borderRadius: 6, padding: "4px 12px" }}>
-              <span style={{ color: "#00C805", fontSize: 10 }}>●</span>
-              <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#00C805" }}>Connected</span>
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <input value={apiKey} onChange={e => setApiKey(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") connect(); }}
-                placeholder={selectedModel.placeholder}
-                type="password"
-                style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 180, outline: "none" }} />
-              <button onClick={connect} disabled={!apiKey.trim()} style={{
-                background: apiKey.trim() ? "#00C80520" : "transparent",
-                border: `1px solid ${apiKey.trim() ? "#00C80566" : "#1a2e1a"}`,
-                borderRadius: 6, padding: "4px 16px",
-                fontFamily: "'DM Mono',monospace", fontSize: 11,
-                color: apiKey.trim() ? "#00C805" : "#3a5a3a",
-                cursor: apiKey.trim() ? "pointer" : "not-allowed",
-              }}>Connect</button>
-            </div>
-          )
-        )}
-
-        <button onClick={onClose} style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", fontSize: 18, padding: "0 4px", lineHeight: 1 }}>×</button>
+      {/* Progress bar — 2px sweep while running */}
+      <div style={{ height: 2, background: "#0d1a0d", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+        {running && <div style={{ position: "absolute", top: 0, height: "100%", background: "#00C805", animation: "vscProgress 1.4s ease-in-out infinite" }} />}
       </div>
 
-      {/* Terminal output */}
-      <div style={{ flex: 1, overflow: "auto", padding: "16px 24px", fontFamily: "'DM Mono',monospace", fontSize: 13, lineHeight: 1.8 }}>
-        {!selectedModel && <div style={{ color: "#3a5a3a" }}>Select a model to get started.</div>}
-        {selectedModel && !connected && (
-          <div style={{ color: "#3a5a3a" }}>
-            Enter your {selectedModel.label} API key and press <span style={{ color: "#00C805" }}>Connect</span>.
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+
+        {/* ── Activity Bar ─────────────────────────────────────────────── */}
+        <div style={{
+          width: 44, flexShrink: 0,
+          background: "#060c06",
+          borderRight: "1px solid #1a2e1a",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", paddingTop: 6, gap: 2,
+        }}>
+          {ACTIVITY_ICONS.map(act => (
+            <button key={act.id} onClick={() => setActiveActivity(act.id)} title={act.label} style={{
+              width: 44, height: 44,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              background: "none", border: "none",
+              borderLeft: `2px solid ${activeActivity === act.id ? "#00C805" : "transparent"}`,
+              color: activeActivity === act.id ? "#c8d0d8" : "#3a5a3a",
+              cursor: "pointer", transition: "color 0.15s",
+            }}>{act.icon}</button>
+          ))}
+        </div>
+
+        {/* ── Main Panel ───────────────────────────────────────────────── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+          {/* Tab strip + controls */}
+          <div style={{
+            display: "flex", alignItems: "center",
+            background: "#060c06",
+            borderBottom: "1px solid #1a2e1a",
+            flexShrink: 0, flexWrap: "wrap",
+          }}>
+            {/* Traffic lights */}
+            <div style={{ display: "flex", gap: 6, padding: "10px 14px 10px 14px" }}>
+              {["#ff5f57","#febc2e","#28c840"].map(c => (
+                <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+              ))}
+            </div>
+
+            {/* Tabs */}
+            <div style={{ display: "flex", alignItems: "stretch" }}>
+              {panelTabs.map(tab => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+                  background: "none", border: "none",
+                  borderBottom: `2px solid ${activeTab === tab.id ? "#00C805" : "transparent"}`,
+                  padding: "9px 16px 7px",
+                  fontFamily: "'DM Mono',monospace", fontSize: 11,
+                  color: activeTab === tab.id ? "#c8d0d8" : "#3a5a3a",
+                  cursor: "pointer", letterSpacing: "0.08em",
+                  display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
+                }}>
+                  {tab.label}
+                  {tab.badge != null && (
+                    <span style={{
+                      background: "#f59e0b22", border: "1px solid #f59e0b55",
+                      color: "#f59e0b", borderRadius: 8,
+                      fontSize: 9, padding: "1px 5px", lineHeight: 1.5,
+                    }}>{tab.badge}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ flex: 1 }} />
+
+            {/* Right controls: model picker, API key, connected, close */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", flexWrap: "wrap" }}>
+              {addingModel ? (
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <input autoFocus value={newModelName} onChange={e => setNewModelName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") addModel(); if (e.key === "Escape") { setAddingModel(false); setNewModelName(""); } }}
+                    placeholder="model name..."
+                    style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 160, outline: "none" }} />
+                  <button onClick={addModel} style={{ background: "#00C80520", border: "1px solid #00C80566", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#00C805", cursor: "pointer" }}>add</button>
+                  <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>cancel</button>
+                </div>
+              ) : (
+                <div ref={modelRef} style={{ position: "relative" }}>
+                  <button onClick={() => !connected && setModelOpen(o => !o)} style={{
+                    background: selectedModel ? "#00C80510" : "#0d1a0d",
+                    border: `1px solid ${selectedModel ? "#00C80544" : "#1a2e1a"}`,
+                    borderRadius: 6, padding: "4px 12px",
+                    fontFamily: "'DM Mono',monospace", fontSize: 11,
+                    color: selectedModel ? "#00C805" : "#3a5a3a",
+                    cursor: connected ? "default" : "pointer",
+                    display: "flex", alignItems: "center", gap: 6, minWidth: 130,
+                  }}>
+                    {selectedModel ? selectedModel.label : "select model"}
+                    {!connected && <span style={{ fontSize: 8, opacity: 0.5 }}>{modelOpen ? "▲" : "▼"}</span>}
+                  </button>
+                  {modelOpen && (
+                    <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: 0, background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 -8px 24px rgba(0,0,0,0.5)" }}>
+                      {allModels.map(m => (
+                        <button key={m.id} onClick={() => { setSelectedModel(m); setModelOpen(false); setApiKey(""); setConnected(false); setVisibleLines(0); setRunning(false); }}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: selectedModel?.id === m.id ? "#00C80512" : "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: selectedModel?.id === m.id ? "#00C805" : "#6b7a99", cursor: "pointer", textAlign: "left" }}>
+                          <span>{m.label}</span>
+                          <span style={{ fontSize: 9, opacity: 0.5 }}>{m.tag}</span>
+                        </button>
+                      ))}
+                      <div style={{ height: 1, background: "#1a2e1a", margin: "4px 0" }} />
+                      <button onClick={() => { setModelOpen(false); setAddingModel(true); }}
+                        style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#3a5a3a", cursor: "pointer" }}>
+                        <span>+</span> Add Model
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {selectedModel && !addingModel && (
+                connected ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#00C80510", border: "1px solid #00C80533", borderRadius: 6, padding: "4px 12px" }}>
+                    <span style={{ color: "#00C805", fontSize: 10 }}>●</span>
+                    <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#00C805" }}>Connected</span>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    <input value={apiKey} onChange={e => setApiKey(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") connect(); }}
+                      placeholder={selectedModel.placeholder}
+                      type="password"
+                      style={{ background: "#0d1a0d", border: "1px solid #1a2e1a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 180, outline: "none" }} />
+                    <button onClick={connect} disabled={!apiKey.trim()} style={{
+                      background: apiKey.trim() ? "#00C80520" : "transparent",
+                      border: `1px solid ${apiKey.trim() ? "#00C80566" : "#1a2e1a"}`,
+                      borderRadius: 6, padding: "4px 16px",
+                      fontFamily: "'DM Mono',monospace", fontSize: 11,
+                      color: apiKey.trim() ? "#00C805" : "#3a5a3a",
+                      cursor: apiKey.trim() ? "pointer" : "not-allowed",
+                    }}>Connect</button>
+                  </div>
+                )
+              )}
+
+              <button onClick={onClose} style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", fontSize: 18, padding: "0 4px", lineHeight: 1 }}>×</button>
+            </div>
           </div>
-        )}
-        {displayedLines.map((line, i) => (
-          <div key={i} style={{ color: lineColor(line.type), whiteSpace: "pre" }}>
-            {line.type === "cursor"
-              ? <span>$ <span style={{ animation: "cliBlink 1s step-end infinite" }}>▌</span></span>
-              : line.text}
+
+          {/* ── Content area ─────────────────────────────────────────── */}
+          <div style={{ flex: 1, overflow: "auto", padding: "14px 20px", fontFamily: "'DM Mono',monospace", fontSize: 13, lineHeight: 1.8 }}>
+
+            {activeTab === "terminal" && (
+              <>
+                {!selectedModel && <div style={{ color: "#3a5a3a" }}>Select a model to get started.</div>}
+                {selectedModel && !connected && (
+                  <div style={{ color: "#3a5a3a" }}>
+                    Enter your {selectedModel.label} API key and press <span style={{ color: "#00C805" }}>Connect</span>.
+                  </div>
+                )}
+                {displayedLines.map((line, i) => (
+                  <div key={i} style={{ color: lineColor(line.type), whiteSpace: "pre" }}>
+                    {line.type === "cursor"
+                      ? <span>$ <span style={{ animation: "cliBlink 1s step-end infinite" }}>▌</span></span>
+                      : line.text}
+                  </div>
+                ))}
+                <div ref={bottomRef} />
+              </>
+            )}
+
+            {activeTab === "problems" && (
+              <div>
+                {problems.length === 0 && (
+                  <div style={{ color: "#3a5a3a" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
+                )}
+                {problems.map((p, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1a2e1a33" }}>
+                    <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a8a6a", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
+                      {p.severity === "warning" ? "⚠" : "ℹ"}
+                    </span>
+                    <div>
+                      <div style={{ color: "#c8d0d8", fontSize: 13 }}>{p.message}</div>
+                      <div style={{ color: "#3a5a3a", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "output" && (
+              <div>
+                {outputLogs.length === 0 && <div style={{ color: "#3a5a3a" }}>No output yet.</div>}
+                {outputLogs.map((line, i) => (
+                  <div key={i} style={{ color: "#4a6a5a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
+                ))}
+              </div>
+            )}
+
           </div>
-        ))}
-        <div ref={bottomRef} />
+        </div>
+      </div>
+
+      {/* ── Status Bar ───────────────────────────────────────────────────── */}
+      <div style={{
+        height: 24, background: "#0f5499",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 12px", flexShrink: 0,
+        fontFamily: "'DM Mono',monospace", fontSize: 11,
+        color: "#ffffffcc", letterSpacing: "0.04em",
+      }}>
+        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+              <path d="M6 9v6M15.4 6.6L8.6 17.4"/>
+            </svg>
+            main
+          </span>
+          {isDone && warningCount > 0 && <span>⚠ {warningCount}</span>}
+          {isDone && infoCount > 0    && <span>ℹ {infoCount}</span>}
+        </div>
+        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          {isDone && <span>152 lines</span>}
+          <span>UTF-8</span>
+          <span>Solidity</span>
+          <span style={{ background: "#ffffff22", padding: "1px 7px", borderRadius: 3 }}>Arbitrum Sepolia</span>
+        </div>
       </div>
     </div>
   );
