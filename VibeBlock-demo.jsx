@@ -1888,7 +1888,11 @@ function DeployPanel({ demoType }) {
       const d    = DEPLOY_DATA[demoType] || DEPLOY_DATA.marketplace;
       const args = d.args(deployer);
       const factory  = new ethers.ContractFactory(d.abi, d.bytecode, signer);
-      const contract = await factory.deploy(...args);
+      const feeData  = await provider.getFeeData();
+      const contract = await factory.deploy(...args, {
+        maxFeePerGas: feeData.maxFeePerGas * 2n,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? ethers.parseUnits("0.001", "gwei"),
+      });
       setTxHash(contract.deploymentTransaction().hash);
       setPhase("pending");
       await contract.waitForDeployment();
