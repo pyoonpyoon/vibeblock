@@ -2815,7 +2815,7 @@ export default function VibeBlock() {
                 {[
                   { num: "01", label: "Bring your idea", body: "A rough prompt, a PRD, or a product description. Any format, any stage.", color: T.accent },
                   { num: "02", label: "VibeBlock scaffolds", body: "Production-grade contract, frontend foundation, security audit baseline, and deploy pipeline — wired for Arbitrum.", color: T.accent, highlight: true },
-                  { num: "03", label: "Iterate and ship", body: "A working foundation to build on. Refine with AI until it's ready. Deploy on your timeline.", color: T.green },
+                  { num: "03", label: "Refine and ship", body: "A working foundation to build on. Refine with AI until it's ready. Deploy on your timeline.", color: T.green },
                 ].map((step, i) => (
                   <span key={step.num} style={{ display: "contents" }}>
                     <div style={{

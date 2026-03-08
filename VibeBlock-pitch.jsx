@@ -194,7 +194,7 @@ function Slide3() {
     },
     {
       num: "03",
-      label: "Iterate and ship",
+      label: "Refine and ship",
       detail: "Working foundation to build on · Refine with AI · Deploy on your timeline",
       color: T.green,
       highlight: false,
