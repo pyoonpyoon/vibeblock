@@ -2417,7 +2417,7 @@ const CLI_LINES = [
   { delay: 5600, text: "$ _", type: "cursor" },
 ];
 
-function CliPanel({ onClose }) {
+function CliPanel({ onClose, panelHeight, setPanelHeight }) {
   const [selectedModel, setSelectedModel] = useState(null);
   const [customModels, setCustomModels] = useState([]);
   const [addingModel, setAddingModel] = useState(false);
@@ -2430,7 +2430,7 @@ function CliPanel({ onClose }) {
   const [activeTab, setActiveTab] = useState("terminal");
   const [activeActivity, setActiveActivity] = useState("explorer");
   const [activeSession, setActiveSession] = useState("vibeblock");
-  const [panelHeight, setPanelHeight] = useState(() => Math.round(window.innerHeight * 0.52));
+  // panelHeight is lifted to parent VibeBlock
   const [sidebarWidth, setSidebarWidth] = useState(148);
   const bottomRef = useRef(null);
   const modelRef = useRef(null);
@@ -2972,6 +2972,7 @@ export default function VibeBlock() {
   const [promptFocused, setPromptFocused] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [cliOpen, setCliOpen] = useState(false);
+  const [panelHeight, setPanelHeight] = useState(() => Math.round(window.innerHeight * 0.52));
   const textareaRef = useRef(null);
 
   Object.assign(T, darkMode ? DARK_T : LIGHT_T);
@@ -3278,7 +3279,7 @@ export default function VibeBlock() {
         onClick={() => setCliOpen(o => !o)}
         title="VibeBlock CLI"
         style={{
-          position: "fixed", bottom: cliOpen ? "calc(52vh + 16px)" : 20, right: 24,
+          position: "fixed", bottom: cliOpen ? panelHeight + 16 : 20, right: 24,
           background: cliOpen ? "#12AAFF20" : T.surface,
           border: `1px solid ${cliOpen ? "#12AAFF66" : T.border}`,
           borderRadius: 10, padding: "8px 16px",
@@ -3295,7 +3296,7 @@ export default function VibeBlock() {
       </button>
 
       {/* CLI panel */}
-      {cliOpen && <CliPanel onClose={() => setCliOpen(false)} />}
+      {cliOpen && <CliPanel onClose={() => setCliOpen(false)} panelHeight={panelHeight} setPanelHeight={setPanelHeight} />}
     </div>
   );
 }
