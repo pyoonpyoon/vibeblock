@@ -1836,7 +1836,7 @@ function DeployPanel({ demoType }) {
   const short     = (a) => a ? `${a.slice(0,6)}...${a.slice(-4)}` : "";
 
   async function connect() {
-    if (!window.ethereum) { setErrMsg("MetaMask not found. Install MetaMask to deploy."); setPhase("err"); return; }
+    if (!window.ethereum) { setErrMsg("No wallet found. Install a wallet (e.g. Rabby or MetaMask) to deploy."); setPhase("err"); return; }
     setPhase("connecting"); setErrMsg(null);
     try {
       const { ethers } = await import("https://esm.sh/ethers@6");
@@ -1913,9 +1913,9 @@ function DeployPanel({ demoType }) {
       {(phase === "idle" || phase === "connecting" || phase === "err") && (
         <>
           <button onClick={connect} disabled={phase === "connecting"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "connecting" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "connecting" ? 0.6 : 1 }}>
-            {phase === "connecting" ? "Connecting..." : "Connect MetaMask"}
+            {phase === "connecting" ? "Connecting..." : "Connect Wallet"}
           </button>
-          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>MetaMask required — deploying {d.name} to Arbitrum Sepolia</div>
+          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Wallet required — deploying {d.contract.name} to Arbitrum Sepolia</div>
         </>
       )}
       {(phase === "connected" || phase === "switching" || phase === "deploying") && (
@@ -1935,7 +1935,7 @@ function DeployPanel({ demoType }) {
             </button>
           ) : (
             <button onClick={deployContract} disabled={phase === "deploying"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "deploying" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "deploying" ? 0.6 : 1 }}>
-              {phase === "deploying" ? "Sign in MetaMask..." : `Deploy ${d.name} →`}
+              {phase === "deploying" ? "Confirm in wallet..." : `Deploy ${d.name} →`}
             </button>
           )}
           <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Arbitrum Sepolia testnet · chain ID 421614</div>
