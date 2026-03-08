@@ -28,24 +28,37 @@ Crypto is invisible to end users. They see dollars and buttons, never wallets or
 - Green: `#00C805` (success/positive)
 - DO NOT use old green terminal colors: `#080c08`, `#1a2e1a`, `#3a5a3a`, `#00C805` for chrome
 
-## Pitch Deck — 11 slides in order
-1. Cover — "Build anything. Runs everywhere."
+## Pitch Deck — 12 slides in order (TOTAL_SLIDES = 12)
+1. Cover — "Build anything. Runs everywhere." — BUILT ON: Arbitrum, Robinhood, ZeroDev, LayerZero, Fhenix, Alchemy, Dune
 2. SlideWaveHook — "A new kind of builder is waking up"
-3. SlideAIStats — 500M AI users bar chart + wave table
+3. SlideAIStats — 500M AI users donut chart + wave table (replaced bar chart with donut)
 4. Slide5 — "Why VibeBlock?" (vs Claude Code/Codex — intentionally before problem/solution)
 5. Slide2 — "The Problem" (browser frames showing the wall)
 6. Slide3 — "The Solution" (3-step cards + light-mode screenshot + corner brackets)
-7. Slide4 — "The Real Opportunity" (invisible blockchain)
-8. Slide6 — "Built for Both" (GUI + CLI)
+7. Slide4 — "The Real Opportunity" (invisible blockchain + ZeroDev callout)
+8. Slide6 — "Built for All" (GUI + CLI) — renamed from "Built for Both"
 9. Slide7 — "Technical Depth" (stack table)
-10. SlidePartners — ZeroDev featured + 5 partners grid
+10. SlidePartners — 8-partner equal grid (4×2): Arbitrum One, Robinhood Chain, ZeroDev, LayerZero, Fhenix, Dune, Alchemy, Timeboost
 11. SlideRoadmap — 4-phase roadmap
+12. SlideArbitrumEverywhere — closing slide, just "Arbitrum Everywhere."
 
 **Slide ordering is intentional** — "Why VibeBlock?" before problem/solution answers "why not just use Claude Code?" objection first. Do NOT reorder.
+
+## Pitch Deck — Key Decisions
+- Paymaster: removed as named partner everywhere. CLI output says "Gas: $0.00 — sponsored" (not "Paymaster sponsored")
+- ERC-4337: replaced with ZeroDev throughout (ZeroDev implements 4337 + 7579 + 7702 + session keys + passkeys)
+- ZeroDev: NOT featured/larger than others in partners grid — equal size to all partners
+- Timeboost: kept as last card in partners grid + last row in stack table. It's an Arbitrum-native feature, not a traditional partner
+- "ZeroDev acquired by Arbitrum" — omitted from Real Opportunity slide per Philip's request
+- Slide8 (The Ask) — defined in code but NOT in slides array. Intentionally excluded from active deck
+- Stats: 23K on-chain devs (Electric Capital 2024) used consistently across all slides
 
 ## VibeBlock-demo.jsx Architecture
 - `DEMOS` array — 4 products: bot, escrow, game, marketplace
 - `T` / `DARK_T` / `LIGHT_T` — theme tokens, reassigned via `Object.assign(T, ...)`
+  - CLI-specific tokens added to both: `cliBorder`, `cliText`, `cliMuted`, `cliDim`
+  - DARK values: `cliBorder: "#1e2d4a"`, `cliText: "#c8d0d8"`, `cliMuted: "#8a9ab8"`, `cliDim: "#375280"`
+  - LIGHT values: `cliBorder: "rgba(0,0,0,0.12)"`, `cliText: "#1e2d3f"`, `cliMuted: "#5a6a85"`, `cliDim: "#9aadcc"`
 - `CliPanel` — VS Code-style terminal. Props: `onClose`, `panelHeight`, `setPanelHeight`, `sidebarOpen`
   - Activity bar (4 icons), panel tabs, action toolbar with functional dropdowns
   - Drag-to-resize: top border (panel height), left sidebar border (sidebar width)
@@ -62,9 +75,10 @@ Crypto is invisible to end users. They see dollars and buttons, never wallets or
 - Screenshot tool: puppeteer installed in preview/ — use Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 
 ## Pitch Angle
-"Arbitrum Everywhere" — Arbitrum is the engine, LayerZero onramps any chain, ERC-4337 removes wallets, Paymaster removes gas.
+"Arbitrum Everywhere" — Arbitrum is the engine, LayerZero onramps any chain, ZeroDev removes wallets/gas (session keys, passkeys, ERC-7579).
 Hero: "Build anything. / Runs everywhere."
 Badge: "BUILD ANYTHING · RUNS EVERYWHERE · NOBODY SEES THE BLOCKCHAIN"
+Closing: "Arbitrum Everywhere." (final slide)
 
 ## What Has Worked
 - Single-file React artifacts — keep everything in one file until told otherwise
@@ -87,3 +101,5 @@ Badge: "BUILD ANYTHING · RUNS EVERYWHERE · NOBODY SEES THE BLOCKCHAIN"
 - Light mode for consumer product UIs, dark mode for developer/infra tools
 - Every product demo must feel like a real consumer app, not a crypto app
 - Pitch slide ordering is deliberate — check before suggesting reorders
+- **[2026-03-07] Warn before context-heavy tasks** — If a task is large enough that it might trigger context compression, warn Philip before executing so he can decide how to proceed.
+  Do instead: say "This task may push context limits and trigger compression — want me to proceed?" before starting.

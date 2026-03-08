@@ -8,6 +8,7 @@ const DARK_T = {
   accent: "#12AAFF", accentGlow: "rgba(18,170,255,0.15)", accentBorder: "rgba(18,170,255,0.35)",
   green: "#00C805", purple: "#a855f7", amber: "#f59e0b", red: "#ef4444",
   grid: "rgba(18,170,255,0.025)", navBg: "rgba(8,9,12,0.85)", isDark: true,
+  cliBorder: "#1e2d4a", cliText: "#c8d0d8", cliMuted: "#8a9ab8", cliDim: "#375280",
 };
 const LIGHT_T = {
   bg: "#F2F4F8", surface: "#FFFFFF", surfaceHover: "#ECEEF3",
@@ -16,6 +17,7 @@ const LIGHT_T = {
   accent: "#0090E0", accentGlow: "rgba(0,144,224,0.08)", accentBorder: "rgba(0,144,224,0.22)",
   green: "#00A843", purple: "#7C3AED", amber: "#1B3270", red: "#DC2626",
   grid: "rgba(0,0,0,0.04)", navBg: "rgba(242,244,248,0.92)", isDark: false,
+  cliBorder: "rgba(0,0,0,0.12)", cliText: "#1e2d3f", cliMuted: "#5a6a85", cliDim: "#9aadcc",
 };
 const T = { ...DARK_T };
 
@@ -2612,8 +2614,8 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
     <div style={{
       position: "fixed", bottom: 0, left: sidebarOpen ? 272 : 0, right: 0,
       height: panelHeight, zIndex: 300,
-      background: "#000000",
-      borderTop: "1px solid #1e2d4a",
+      background: T.bg,
+      borderTop: `1px solid ${T.cliBorder}`,
       boxShadow: "0 -16px 64px rgba(18,170,255,0.06)",
       display: "flex", flexDirection: "column",
       transition: "left 0.25s cubic-bezier(0.4,0,0.2,1)",
@@ -2639,7 +2641,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
       />
 
       {/* Progress bar — 2px sweep while running */}
-      <div style={{ height: 2, background: "#0d1626", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+      <div style={{ height: 2, background: T.surface, position: "relative", overflow: "hidden", flexShrink: 0 }}>
         {running && <div style={{ position: "absolute", top: 0, height: "100%", background: "#12AAFF", animation: "vscProgress 1.4s ease-in-out infinite" }} />}
       </div>
 
@@ -2648,8 +2650,8 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
         {/* ── Activity Bar ─────────────────────────────────────────────── */}
         <div style={{
           width: 44, flexShrink: 0,
-          background: "#000000",
-          borderRight: "1px solid #1e2d4a",
+          background: T.bg,
+          borderRight: `1px solid ${T.cliBorder}`,
           display: "flex", flexDirection: "column",
           alignItems: "center", paddingTop: 6, gap: 2,
         }}>
@@ -2661,7 +2663,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 background: "none", border: "none",
                 borderLeft: `2px solid ${activeActivity === act.id ? "#12AAFF" : "transparent"}`,
-                color: activeActivity === act.id ? "#c8d0d8" : "#375280",
+                color: activeActivity === act.id ? T.cliText : T.cliDim,
                 cursor: "pointer", transition: "color 0.15s",
               }}>{act.icon}</button>
           ))}
@@ -2684,18 +2686,18 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
           const extColor = { sol: "#12AAFF", jsx: "#61dafb", html: "#e34c26", js: "#f7df1e", toml: "#9b59b6", json: "#00C805" };
 
           const PanelLabel = ({ children }) => (
-            <div style={{ padding: "10px 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", letterSpacing: "0.18em", textTransform: "uppercase", userSelect: "none" }}>{children}</div>
+            <div style={{ padding: "10px 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: T.cliDim, letterSpacing: "0.18em", textTransform: "uppercase", userSelect: "none" }}>{children}</div>
           );
 
           return (
-            <div style={{ width: 220, flexShrink: 0, borderRight: "1px solid #1e2d4a", background: "#000000", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${T.cliBorder}`, background: T.bg, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
               {/* EXPLORER */}
               {activeActivity === "explorer" && (
                 <div style={{ flex: 1, overflowY: "auto" }}>
                   <PanelLabel>Explorer</PanelLabel>
                   {!isDone && (
-                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280", lineHeight: 1.6 }}>
+                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.cliDim, lineHeight: 1.6 }}>
                       No folder open.<br />Connect a model and run to scaffold your project.
                     </div>
                   )}
@@ -2708,18 +2710,18 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                     return (
                       <div key={i} onClick={() => f.kind === "folder" && toggleFolder(f.name)}
                         style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px 3px", paddingLeft: 8 + f.depth * 16, cursor: f.kind === "folder" ? "pointer" : "default", userSelect: "none" }}
-                        onMouseEnter={e => e.currentTarget.style.background = "#ffffff08"}
+                        onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
                         onMouseLeave={e => e.currentTarget.style.background = "none"}>
                         {f.kind === "folder" ? (
                           <>
-                            <span style={{ color: "#375280", fontSize: 9, width: 10 }}>{isOpen ? "▼" : "▶"}</span>
-                            <span style={{ color: "#c8d0d8", fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
+                            <span style={{ color: T.cliDim, fontSize: 9, width: 10 }}>{isOpen ? "▼" : "▶"}</span>
+                            <span style={{ color: T.cliText, fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
                           </>
                         ) : (
                           <>
                             <span style={{ width: 10 }} />
-                            <span style={{ width: 8, height: 8, borderRadius: 2, background: extColor[f.ext] || "#375280", flexShrink: 0 }} />
-                            <span style={{ color: "#8a9ab8", fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
+                            <span style={{ width: 8, height: 8, borderRadius: 2, background: extColor[f.ext] || T.cliDim, flexShrink: 0 }} />
+                            <span style={{ color: T.cliMuted, fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
                           </>
                         )}
                       </div>
@@ -2735,15 +2737,15 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                   <div style={{ padding: "0 8px 8px" }}>
                     <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                       placeholder="Search terminal…"
-                      style={{ width: "100%", background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#c8d0d8", outline: "none", boxSizing: "border-box" }} />
+                      style={{ width: "100%", background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliText, outline: "none", boxSizing: "border-box" }} />
                   </div>
                   {searchQuery && CLI_LINES.filter(l => l.text.toLowerCase().includes(searchQuery.toLowerCase()) && l.text.trim()).map((l, i) => (
-                    <div key={i} style={{ padding: "4px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#8a9ab8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div key={i} style={{ padding: "4px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliMuted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {l.text.replace(new RegExp(`(${searchQuery})`, "gi"), "«$1»")}
                     </div>
                   ))}
                   {searchQuery && !CLI_LINES.some(l => l.text.toLowerCase().includes(searchQuery.toLowerCase())) && (
-                    <div style={{ padding: "8px 12px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280" }}>No results.</div>
+                    <div style={{ padding: "8px 12px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.cliDim }}>No results.</div>
                   )}
                 </div>
               )}
@@ -2755,24 +2757,24 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                   {isDone ? (
                     <>
                       <div style={{ padding: "0 8px 8px" }}>
-                        <input placeholder="Message (⌘↵ to commit)" style={{ width: "100%", background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#c8d0d8", outline: "none", boxSizing: "border-box" }} />
+                        <input placeholder="Message (⌘↵ to commit)" style={{ width: "100%", background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliText, outline: "none", boxSizing: "border-box" }} />
                       </div>
-                      <div style={{ padding: "0 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", letterSpacing: "0.1em" }}>CHANGES (3)</div>
+                      <div style={{ padding: "0 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: T.cliDim, letterSpacing: "0.1em" }}>CHANGES (3)</div>
                       {[
                         { status: "U", name: "TradeportEscrow.sol", color: "#00C805" },
                         { status: "U", name: "App.jsx",             color: "#00C805" },
                         { status: "U", name: "deploy.js",           color: "#00C805" },
                       ].map(f => (
                         <div key={f.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "3px 12px" }}
-                          onMouseEnter={e => e.currentTarget.style.background = "#ffffff08"}
+                          onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
                           onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#8a9ab8" }}>{f.name}</span>
+                          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.cliMuted }}>{f.name}</span>
                           <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: f.color }}>{f.status}</span>
                         </div>
                       ))}
                     </>
                   ) : (
-                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280" }}>No changes detected.</div>
+                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.cliDim }}>No changes detected.</div>
                   )}
                 </div>
               )}
@@ -2787,15 +2789,15 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                     { name: "ESLint",         version: "3.0.5",   stars: 4, featured: false },
                     { name: "VibeBlock CLI",  version: "1.0.0",   stars: 5, featured: true  },
                   ].map(ext => (
-                    <div key={ext.name} style={{ padding: "8px 12px", borderBottom: "1px solid #1e2d4a22" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
+                    <div key={ext.name} style={{ padding: "8px 12px", borderBottom: `1px solid ${T.cliBorder}` }}
+                      onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
                       onMouseLeave={e => e.currentTarget.style.background = "none"}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: ext.featured ? "#12AAFF" : "#c8d0d8", fontWeight: ext.featured ? 600 : 400 }}>{ext.name}</span>
+                        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: ext.featured ? "#12AAFF" : T.cliText, fontWeight: ext.featured ? 600 : 400 }}>{ext.name}</span>
                         {ext.featured && <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "#12AAFF", background: "#12AAFF18", border: "1px solid #12AAFF44", borderRadius: 3, padding: "1px 5px" }}>featured</span>}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
-                        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280" }}>v{ext.version}</span>
+                        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: T.cliDim }}>v{ext.version}</span>
                         <span style={{ fontSize: 10, color: "#f59e0b", letterSpacing: 1 }}>{"★".repeat(ext.stars)}{"☆".repeat(5 - ext.stars)}</span>
                       </div>
                     </div>
@@ -2813,8 +2815,8 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
           {/* Tab strip + controls */}
           <div style={{
             display: "flex", alignItems: "center",
-            background: "#000000",
-            borderBottom: "1px solid #1e2d4a",
+            background: T.bg,
+            borderBottom: `1px solid ${T.cliBorder}`,
             flexShrink: 0, flexWrap: "wrap",
           }}>
             {/* Traffic lights */}
@@ -2832,7 +2834,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                   borderBottom: `2px solid ${activeTab === tab.id ? "#12AAFF" : "transparent"}`,
                   padding: "9px 16px 7px",
                   fontFamily: "'DM Mono',monospace", fontSize: 11,
-                  color: activeTab === tab.id ? "#c8d0d8" : "#375280",
+                  color: activeTab === tab.id ? T.cliText : T.cliDim,
                   cursor: "pointer", letterSpacing: "0.08em",
                   display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
                 }}>
@@ -2857,18 +2859,18 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                   <input autoFocus value={newModelName} onChange={e => setNewModelName(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") addModel(); if (e.key === "Escape") { setAddingModel(false); setNewModelName(""); } }}
                     placeholder="model name..."
-                    style={{ background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 160, outline: "none" }} />
+                    style={{ background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliText, width: 160, outline: "none" }} />
                   <button onClick={addModel} style={{ background: "#12AAFF20", border: "1px solid #12AAFF66", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#12AAFF", cursor: "pointer" }}>add</button>
-                  <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#375280", cursor: "pointer" }}>cancel</button>
+                  <button onClick={() => { setAddingModel(false); setNewModelName(""); }} style={{ background: "none", border: `1px solid ${T.cliBorder}`, borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliDim, cursor: "pointer" }}>cancel</button>
                 </div>
               ) : (
                 <div ref={modelRef} style={{ position: "relative" }}>
                   <button onClick={() => !connected && setModelOpen(o => !o)} style={{
-                    background: selectedModel ? "#12AAFF10" : "#0d1626",
-                    border: `1px solid ${selectedModel ? "#12AAFF44" : "#1e2d4a"}`,
+                    background: selectedModel ? "#12AAFF10" : T.surface,
+                    border: `1px solid ${selectedModel ? "#12AAFF44" : T.cliBorder}`,
                     borderRadius: 6, padding: "4px 12px",
                     fontFamily: "'DM Mono',monospace", fontSize: 11,
-                    color: selectedModel ? "#12AAFF" : "#375280",
+                    color: selectedModel ? "#12AAFF" : T.cliDim,
                     cursor: connected ? "default" : "pointer",
                     display: "flex", alignItems: "center", gap: 6, minWidth: 130,
                   }}>
@@ -2876,7 +2878,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                     {!connected && <span style={{ fontSize: 8, opacity: 0.5 }}>{modelOpen ? "▲" : "▼"}</span>}
                   </button>
                   {modelOpen && (
-                    <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+                    <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
                       {allModels.map(m => (
                         <button key={m.id} onClick={() => { setSelectedModel(m); setModelOpen(false); setApiKey(""); setConnected(false); setVisibleLines(0); setRunning(false); }}
                           style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: selectedModel?.id === m.id ? "#12AAFF12" : "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: selectedModel?.id === m.id ? "#12AAFF" : "#6b7a99", cursor: "pointer", textAlign: "left" }}>
@@ -2884,9 +2886,9 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                           <span style={{ fontSize: 9, opacity: 0.5 }}>{m.tag}</span>
                         </button>
                       ))}
-                      <div style={{ height: 1, background: "#1e2d4a", margin: "4px 0" }} />
+                      <div style={{ height: 1, background: T.cliBorder, margin: "4px 0" }} />
                       <button onClick={() => { setModelOpen(false); setAddingModel(true); }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#375280", cursor: "pointer" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", background: "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliDim, cursor: "pointer" }}>
                         <span>+</span> Add Model
                       </button>
                     </div>
@@ -2906,13 +2908,13 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                       onKeyDown={e => { if (e.key === "Enter") connect(); }}
                       placeholder={selectedModel.placeholder}
                       type="password"
-                      style={{ background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#e8eaf0", width: 180, outline: "none" }} />
+                      style={{ background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 6, padding: "4px 10px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.cliText, width: 180, outline: "none" }} />
                     <button onClick={connect} disabled={!apiKey.trim()} style={{
                       background: apiKey.trim() ? "#12AAFF20" : "transparent",
-                      border: `1px solid ${apiKey.trim() ? "#12AAFF66" : "#1e2d4a"}`,
+                      border: `1px solid ${apiKey.trim() ? "#12AAFF66" : T.cliBorder}`,
                       borderRadius: 6, padding: "4px 16px",
                       fontFamily: "'DM Mono',monospace", fontSize: 11,
-                      color: apiKey.trim() ? "#12AAFF" : "#375280",
+                      color: apiKey.trim() ? "#12AAFF" : T.cliDim,
                       cursor: apiKey.trim() ? "pointer" : "not-allowed",
                     }}>Connect</button>
                   </div>
@@ -2929,7 +2931,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                     fontFamily: "'DM Mono',monospace", borderRadius: 4,
                     transition: "background 0.12s, color 0.12s",
                   }}
-                  onMouseEnter={e => { if (!active) { e.currentTarget.style.color = "#c8d0d8"; e.currentTarget.style.background = "#ffffff10"; } }}
+                  onMouseEnter={e => { if (!active) { e.currentTarget.style.color = T.cliText; e.currentTarget.style.background = "#ffffff10"; } }}
                   onMouseLeave={e => { if (!active) { e.currentTarget.style.color = "#7a90b0"; e.currentTarget.style.background = "none"; } }}
                   >{label}</button>
                 );
@@ -2940,28 +2942,28 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       width: "100%", background: hoveredItem === id ? "#12AAFF18" : "none",
                       border: "none", padding: "6px 16px", cursor: "pointer",
-                      color: dim ? "#4a6a9a" : "#c8d0d8",
+                      color: dim ? T.cliDim : T.cliText,
                       fontFamily: "'DM Sans', sans-serif", fontSize: 13, textAlign: "left",
                     }}>
                     <span>{label}</span>
-                    {shortcut && <span style={{ color: "#4a6a9a", fontSize: 11, marginLeft: 32, flexShrink: 0 }}>{shortcut}</span>}
-                    {sub && <span style={{ color: "#4a6a9a", fontSize: 13 }}>›</span>}
+                    {shortcut && <span style={{ color: T.cliDim, fontSize: 11, marginLeft: 32, flexShrink: 0 }}>{shortcut}</span>}
+                    {sub && <span style={{ color: T.cliDim, fontSize: 13 }}>›</span>}
                   </button>
                 );
-                const Divider = () => <div style={{ height: 1, background: "#1e2d4a", margin: "4px 0" }} />;
+                const Divider = () => <div style={{ height: 1, background: T.cliBorder, margin: "4px 0" }} />;
                 const menuStyle = {
                   position: "absolute", top: "calc(100% + 6px)", right: 0,
-                  background: "#12151f", border: "1px solid #1e2d4a", borderRadius: 8,
+                  background: T.surface, border: `1px solid ${T.cliBorder}`, borderRadius: 8,
                   padding: "4px 0", minWidth: 290, zIndex: 700,
                   boxShadow: "0 12px 40px rgba(0,0,0,0.7)",
                 };
                 return (
-                  <div ref={actionsRef} style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1e2d4a", marginLeft: 4, paddingLeft: 6, gap: 0, position: "relative" }}>
+                  <div ref={actionsRef} style={{ display: "flex", alignItems: "center", borderLeft: `1px solid ${T.cliBorder}`, marginLeft: 4, paddingLeft: 6, gap: 0, position: "relative" }}>
                     <Btn label="+" title="New Terminal" onClick={() => { addSession("zsh"); }} />
                     <Btn label="∨" title="Launch Profile" active={openDropdown === "profile"} onClick={() => setOpenDropdown(d => d === "profile" ? null : "profile")} />
                     <Btn label="···" title="More Actions" active={openDropdown === "more"} onClick={() => setOpenDropdown(d => d === "more" ? null : "more")} />
                     <Btn label="⊟" title="Split Terminal" onClick={() => addSession("zsh")} />
-                    <div style={{ width: 1, height: 13, background: "#1e2d4a", margin: "0 6px" }} />
+                    <div style={{ width: 1, height: 13, background: T.cliBorder, margin: "0 6px" }} />
                     <Btn label="×" title="Close Panel" onClick={onClose} />
 
                     {openDropdown === "profile" && (
@@ -3008,9 +3010,9 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
 
               {activeTab === "terminal" && (
                 <>
-                  {!selectedModel && <div style={{ color: "#375280" }}>Select a model to get started.</div>}
+                  {!selectedModel && <div style={{ color: T.cliDim }}>Select a model to get started.</div>}
                   {selectedModel && !connected && (
-                    <div style={{ color: "#375280" }}>
+                    <div style={{ color: T.cliDim }}>
                       Enter your {selectedModel.label} API key and press <span style={{ color: "#12AAFF" }}>Connect</span>.
                     </div>
                   )}
@@ -3028,16 +3030,16 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
               {activeTab === "problems" && (
                 <div>
                   {problems.length === 0 && (
-                    <div style={{ color: "#375280" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
+                    <div style={{ color: T.cliDim }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
                   )}
                   {problems.map((p, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1e2d4a33" }}>
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: `1px solid ${T.cliBorder}` }}>
                       <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a7aaa", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
                         {p.severity === "warning" ? "⚠" : "ℹ"}
                       </span>
                       <div>
-                        <div style={{ color: "#c8d0d8", fontSize: 13 }}>{p.message}</div>
-                        <div style={{ color: "#375280", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
+                        <div style={{ color: T.cliText, fontSize: 13 }}>{p.message}</div>
+                        <div style={{ color: T.cliDim, fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
                       </div>
                     </div>
                   ))}
@@ -3046,9 +3048,9 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
 
               {activeTab === "output" && (
                 <div>
-                  {outputLogs.length === 0 && <div style={{ color: "#375280" }}>No output yet.</div>}
+                  {outputLogs.length === 0 && <div style={{ color: T.cliDim }}>No output yet.</div>}
                   {outputLogs.map((line, i) => (
-                    <div key={i} style={{ color: "#4a6a9a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
+                    <div key={i} style={{ color: T.cliDim, whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
                   ))}
                 </div>
               )}
@@ -3058,7 +3060,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
             {/* ── Terminal Instances Sidebar ──────────────────────────── */}
             <div style={{
               width: sidebarWidth, flexShrink: 0,
-              background: "#000000",
+              background: T.bg,
               display: "flex", flexDirection: "row",
               overflow: "hidden",
               transition: sidebarWidth === 0 ? "width 0.15s ease" : "none",
@@ -3078,7 +3080,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
               {/* Session list — hidden when collapsed */}
               <div style={{
                 flex: 1, overflowY: "auto", overflowX: "hidden",
-                borderLeft: "1px solid #1e2d4a",
+                borderLeft: `1px solid ${T.cliBorder}`,
                 opacity: sidebarWidth < 48 ? 0 : 1,
                 transition: "opacity 0.1s",
               }}>
@@ -3086,18 +3088,18 @@ function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
                   <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "8px 10px",
-                    background: activeSession === sess.id ? "#1e2d4a" : "none",
+                    background: activeSession === sess.id ? T.surfaceHover : "none",
                     border: "none",
                     borderLeft: `2px solid ${activeSession === sess.id ? "#12AAFF" : "transparent"}`,
                     cursor: "pointer", textAlign: "left", width: "100%",
                   }}>
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#12AAFF" : "#375280"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#12AAFF" : T.cliDim} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="1" y="1" width="14" height="14" rx="2"/>
                       <polyline points="4,5 7,8 4,11"/><line x1="8" y1="11" x2="12" y2="11"/>
                     </svg>
                     <span style={{
                       fontFamily: "'DM Mono',monospace", fontSize: 11,
-                      color: activeSession === sess.id ? "#c8d0d8" : "#375280",
+                      color: activeSession === sess.id ? T.cliText : T.cliDim,
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>{sess.name}</span>
                   </button>
@@ -3216,9 +3218,9 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
   const toggle = (k) => setExpanded(s => ({ ...s, [k]: !s[k] }));
 
   const SectionHeader = ({ label, skey }) => (
-    <button onClick={() => toggle(skey)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, padding: "10px 16px 6px", background: "none", border: "none", cursor: "pointer", color: "#375280", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}
-      onMouseEnter={e => e.currentTarget.style.color = "#8ca0bf"}
-      onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+    <button onClick={() => toggle(skey)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, padding: "10px 16px 6px", background: "none", border: "none", cursor: "pointer", color: T.cliDim, fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}
+      onMouseEnter={e => e.currentTarget.style.color = T.cliMuted}
+      onMouseLeave={e => e.currentTarget.style.color = T.cliDim}
     >
       <span style={{ fontSize: 9, transform: expanded[skey] ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s", display: "inline-block", lineHeight: 1 }}>▶</span>
       {label}
@@ -3228,17 +3230,17 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
   return (
     <>
       <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 199, opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 0.2s" }} />
-      <div style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: 272, background: "#000", borderRight: "1px solid #1e2d4a", zIndex: 200, transform: open ? "translateX(0)" : "translateX(-272px)", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", fontFamily: "'DM Mono',monospace" }}>
+      <div style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: 272, background: T.bg, borderRight: `1px solid ${T.cliBorder}`, zIndex: 200, transform: open ? "translateX(0)" : "translateX(-272px)", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", fontFamily: "'DM Mono',monospace" }}>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "18px 16px 14px", borderBottom: "1px solid #1e2d4a", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "18px 16px 14px", borderBottom: `1px solid ${T.cliBorder}`, flexShrink: 0 }}>
           <div style={{ width: 24, height: 24, background: "#12AAFF", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px #12AAFF44", flexShrink: 0 }}>
             <div style={{ width: 9, height: 9, background: "#000", borderRadius: 2 }} />
           </div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 13, color: "#fff", letterSpacing: "0.08em", flex: 1 }}>VIBEBLOCK</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#375280", padding: 4, display: "flex", alignItems: "center", borderRadius: 4, transition: "color 0.15s" }}
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: T.cliDim, padding: 4, display: "flex", alignItems: "center", borderRadius: 4, transition: "color 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.color = "#12AAFF"}
-            onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+            onMouseLeave={e => e.currentTarget.style.color = T.cliDim}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -3246,9 +3248,9 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
 
         {/* New Chat */}
         <div style={{ padding: "10px 12px", flexShrink: 0 }}>
-          <button onClick={() => { onNewChat(); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, background: "#12AAFF14", border: "1px solid #12AAFF30", borderRadius: 8, padding: "9px 14px", cursor: "pointer", color: "#12AAFF", fontSize: 12, fontWeight: 600, transition: "all 0.15s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#12AAFF22"; e.currentTarget.style.borderColor = "#12AAFF55"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#12AAFF14"; e.currentTarget.style.borderColor = "#12AAFF30"; }}
+          <button onClick={() => { onNewChat(); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "9px 14px", cursor: "pointer", color: "#12AAFF", fontSize: 12, fontWeight: 600, transition: "all 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = T.accentBorder; e.currentTarget.style.borderColor = "#12AAFF55"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = T.accentGlow; e.currentTarget.style.borderColor = T.accentBorder; }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             New Chat
@@ -3262,13 +3264,13 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
           <SectionHeader label="Recent" skey="recents" />
           {expanded.recents && RECENTS.map((r, i) => (
             <button key={i} onClick={() => { onProject(r); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+              onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
               onMouseLeave={e => e.currentTarget.style.background = "none"}
             >
               <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1 }}>{r.emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, color: "#c8d8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</div>
-                <div style={{ fontSize: 10, color: "#375280", marginTop: 2 }}>{r.time}</div>
+                <div style={{ fontSize: 12, color: T.cliText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</div>
+                <div style={{ fontSize: 10, color: T.cliDim, marginTop: 2 }}>{r.time}</div>
               </div>
             </button>
           ))}
@@ -3278,13 +3280,13 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
             <SectionHeader label="Projects" skey="projects" />
             {expanded.projects && DEMOS.map((d) => (
               <button key={d.id} onClick={() => { onProject({ demoId: d.id }); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+                onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
                 onMouseLeave={e => e.currentTarget.style.background = "none"}
               >
                 <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1 }}>{d.emoji}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, color: "#c8d8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.title}</div>
-                  <div style={{ fontSize: 10, color: "#375280", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.tagline}</div>
+                  <div style={{ fontSize: 12, color: T.cliText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.title}</div>
+                  <div style={{ fontSize: 10, color: T.cliDim, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.tagline}</div>
                 </div>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: d.color, flexShrink: 0, boxShadow: `0 0 5px ${d.color}88` }} />
               </button>
@@ -3296,12 +3298,12 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
             <SectionHeader label="Folders" skey="folders" />
             {expanded.folders && FOLDERS.map((f, i) => (
               <button key={i} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+                onMouseEnter={e => e.currentTarget.style.background = T.surfaceHover}
                 onMouseLeave={e => e.currentTarget.style.background = "none"}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                <span style={{ flex: 1, fontSize: 12, color: "#c8d8f0" }}>{f.label}</span>
-                <span style={{ fontSize: 10, color: "#375280", background: "#1e2d4a44", borderRadius: 10, padding: "1px 7px" }}>{f.count}</span>
+                <span style={{ flex: 1, fontSize: 12, color: T.cliText }}>{f.label}</span>
+                <span style={{ fontSize: 10, color: T.cliDim, background: T.surfaceHover, borderRadius: 10, padding: "1px 7px" }}>{f.count}</span>
               </button>
             ))}
           </div>
@@ -3309,17 +3311,17 @@ function AppSidebar({ open, onClose, onNewChat, onProject }) {
         </div>
 
         {/* User footer */}
-        <div style={{ padding: "12px 16px", borderTop: "1px solid #1e2d4a", flexShrink: 0, display: "flex", alignItems: "center", gap: 9 }}>
+        <div style={{ padding: "12px 16px", borderTop: `1px solid ${T.cliBorder}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 9 }}>
           <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#12AAFF,#0EA5E9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#000", fontFamily: "'DM Sans',sans-serif" }}>P</span>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, color: "#c8d8f0", fontWeight: 500 }}>pyoonpyoon</div>
-            <div style={{ fontSize: 10, color: "#375280" }}>Arbitrum Hackathon</div>
+            <div style={{ fontSize: 12, color: T.cliText, fontWeight: 500 }}>pyoonpyoon</div>
+            <div style={{ fontSize: 10, color: T.cliDim }}>Arbitrum Hackathon</div>
           </div>
-          <button style={{ background: "none", border: "none", cursor: "pointer", color: "#375280", padding: 4, display: "flex", alignItems: "center", transition: "color 0.15s" }}
+          <button style={{ background: "none", border: "none", cursor: "pointer", color: T.cliDim, padding: 4, display: "flex", alignItems: "center", transition: "color 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.color = "#12AAFF"}
-            onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+            onMouseLeave={e => e.currentTarget.style.color = T.cliDim}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           </button>

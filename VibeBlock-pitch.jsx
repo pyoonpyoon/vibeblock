@@ -14,7 +14,7 @@ const T = {
   red: "#ef4444",
 };
 
-const TOTAL_SLIDES = 11;
+const TOTAL_SLIDES = 12;
 
 // ─── Slide 1: Cover ───────────────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ function Slide1() {
           color: T.muted, textTransform: "uppercase", marginBottom: 80,
         }}>Arbitrum Everywhere · Powered by LayerZero</div>
         <div style={{ display: "flex", gap: 48, alignItems: "center" }}>
-          {["Arbitrum", "LayerZero", "Fhenix", "Robinhood Chain"].map((p) => (
+          {["Arbitrum", "Robinhood", "ZeroDev", "LayerZero", "Fhenix", "Alchemy", "Dune"].map((p) => (
             <div key={p} style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: T.muted, letterSpacing: "0.1em" }}>{p}</div>
           ))}
         </div>
@@ -189,40 +189,45 @@ function Slide3() {
   return (
     <div style={{
       width: "100%", height: "100%",
-      display: "grid",
-      gridTemplateColumns: "34% 1fr",
-      gridTemplateRows: "auto 1fr auto",
-      gap: "14px 40px",
-      padding: "24px 64px 20px",
+      display: "flex", flexDirection: "column",
+      justifyContent: "center",
     }}>
 
-      {/* Row 1: "The Solution" — spans full width, centered */}
-      <div style={{ gridColumn: "1 / -1", textAlign: "center", fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase" }}>
+      {/* Label — full width, centered, just above screenshot */}
+      <div style={{ textAlign: "center", fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 24 }}>
         The Solution
       </div>
 
-      {/* Row 2 left: 3-step cards, vertically centered */}
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        {cards.map((card, i) => (
-          <div key={card.num}>
-            <div style={{
-              background: card.highlight ? `${T.accent}0d` : T.surface,
-              border: `1px solid ${card.highlight ? T.accent : T.border}`,
-              borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column",
-            }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: card.color, letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>{card.num}</div>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 22, color: T.text, marginBottom: 6, lineHeight: 1.2 }}>{card.label}</div>
-              <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{card.detail}</div>
-            </div>
-            {i < cards.length - 1 && (
-              <div style={{ fontSize: 20, color: T.muted, textAlign: "center", padding: "6px 0" }}>↓</div>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Main 2-column area */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "34% 1fr",
+        gap: "0 40px",
+        padding: "0 64px",
+        alignItems: "center",
+      }}>
 
-      {/* Row 2 right: screenshot with corner brackets, vertically centered */}
-      <div style={{ display: "flex", alignItems: "center" }}>
+        {/* Left: 3-step cards */}
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          {cards.map((card, i) => (
+            <div key={card.num}>
+              <div style={{
+                background: card.highlight ? `${T.accent}0d` : T.surface,
+                border: `1px solid ${card.highlight ? T.accent : T.border}`,
+                borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column",
+              }}>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: card.color, letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>{card.num}</div>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 22, color: T.text, marginBottom: 6, lineHeight: 1.2 }}>{card.label}</div>
+                <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{card.detail}</div>
+              </div>
+              {i < cards.length - 1 && (
+                <div style={{ fontSize: 20, color: T.muted, textAlign: "center", padding: "6px 0" }}>↓</div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Right: screenshot with corner brackets */}
         <div style={{ position: "relative", width: "100%" }}>
           <div style={{ position: "absolute", top: -6, left: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
           <div style={{ position: "absolute", top: -6, right: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
@@ -231,10 +236,11 @@ function Slide3() {
           <div style={{ position: "absolute", inset: -1, borderRadius: 12, boxShadow: `0 0 40px ${T.accent}18, 0 0 0 1px ${T.border}`, pointerEvents: "none", zIndex: 1 }} />
           <img src="/vb-screenshot-light.png" alt="VibeBlock front page" style={{ width: "100%", display: "block", borderRadius: 10, objectFit: "cover", objectPosition: "top" }} />
         </div>
+
       </div>
 
-      {/* Row 3: tagline — spans full width, centered */}
-      <div style={{ gridColumn: "1 / -1", textAlign: "center" }}>
+      {/* Tagline — full width, centered, just below screenshot */}
+      <div style={{ textAlign: "center", marginTop: 28 }}>
         <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(20px, 2.2vw, 34px)", lineHeight: 1.2 }}>
           <span style={{ color: T.green }}>User sees: an app.</span>
           {"  "}
@@ -263,8 +269,7 @@ function Slide4() {
   const underneath = [
     { label: "Arbitrum One", color: T.accent, sub: "Settlement, 250ms" },
     { label: "LayerZero", color: T.purple, sub: "Any chain → Arbitrum" },
-    { label: "ERC-4337", color: T.amber, sub: "No seed phrases" },
-    { label: "Paymaster", color: T.green, sub: "Gas? What gas?" },
+    { label: "ZeroDev", color: "#7c3aed", sub: "Session keys · passkeys · no wallets" },
     { label: "USDC", color: T.muted, sub: "Dollars, not tokens" },
   ];
 
@@ -273,8 +278,8 @@ function Slide4() {
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 16 }}>
         The Real Opportunity
       </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 3.5vw, 48px)", textAlign: "center", marginBottom: 48, lineHeight: 1.1 }}>
-        The blockchain is the engine.{" "}
+      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 3.5vw, 48px)", textAlign: "center", marginBottom: 48, lineHeight: 1.3 }}>
+        The blockchain is the engine.<br />
         <span style={{ color: T.accent }}>The app is the product.</span>
       </div>
 
@@ -323,7 +328,17 @@ function Slide4() {
         </div>
       </div>
 
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: T.muted, textAlign: "center", marginTop: 36, lineHeight: 1.7, maxWidth: 800 }}>
+      {/* ZeroDev acquisition callout */}
+      <div style={{ marginTop: 32, width: "100%", background: `#7c3aed0d`, border: `1px solid #7c3aed44`, borderRadius: 14, padding: "16px 28px", display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7c3aed", flexShrink: 0 }} />
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: T.muted, lineHeight: 1.6 }}>
+          <span style={{ color: "#7c3aed", fontWeight: 700 }}>ZeroDev</span> is the account abstraction layer that makes this real.
+          Session keys, passkeys, and ERC-7579 modular accounts mean{" "}
+          <span style={{ color: T.text, fontWeight: 500 }}>every app VibeBlock ships gets walletless UX as a default, not an afterthought.</span>
+        </div>
+      </div>
+
+      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: T.muted, textAlign: "center", marginTop: 24, lineHeight: 1.7, maxWidth: 800 }}>
         Nobody at the Genius Bar asks what chip is inside. They just tap, trust, and it works.{" "}
         <span style={{ color: T.text, fontWeight: 500 }}>That's what Arbitrum should be — infrastructure that powers everything, visible to no one.</span>
       </div>
@@ -342,7 +357,7 @@ const PITCH_CLI_LINES = [
   { delay: 3200, text: "→ Generating React frontend...", type: "info" },
   { delay: 4000, text: "→ Deploying to Arbitrum Sepolia...", type: "info" },
   { delay: 4700, text: "✓ Contract: 0x7f3a...e29c (Arbiscan ↗)", type: "success" },
-  { delay: 5100, text: "✓ Gas: $0.00 — Paymaster sponsored", type: "success" },
+  { delay: 5100, text: "✓ Gas: $0.00 — sponsored", type: "success" },
   { delay: 5500, text: "✓ Done in 11.4s", type: "success" },
   { delay: 5900, text: "$ _", type: "cursor" },
 ];
@@ -370,11 +385,11 @@ function Slide5() {
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 10 }}>
         Why VibeBlock?
       </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(20px, 2.4vw, 34px)", textAlign: "center", marginBottom: 8, lineHeight: 1.15, maxWidth: 900 }}>
-        Claude Code and Lovable created millions of new builders overnight.
+      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(20px, 2.4vw, 34px)", textAlign: "center", marginBottom: 8, lineHeight: 1.15 }}>
+        Claude Code & Lovable<br />created millions of new builders overnight.
       </div>
       <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: T.muted, textAlign: "center", marginBottom: 28, maxWidth: 800 }}>
-        A teacher in Ohio can ship a web app. A designer in Lagos can prototype a SaaS.{" "}
+        A teacher in Ohio can ship a web app. A designer in Lagos can prototype a SaaS.<br />
         <span style={{ color: T.text, fontWeight: 500 }}>None of them know what a rollup is — and now they don't have to.</span>
       </div>
 
@@ -481,14 +496,14 @@ function Slide6() {
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 72px" }}>
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 14 }}>
-        Built for Both
+        Built for All
       </div>
       <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3.2vw, 46px)", textAlign: "center", marginBottom: 10, lineHeight: 1.1 }}>
-        For everyone.{" "}
-        <span style={{ color: T.accent }}>For anyone.</span>
+        For founders, for engineers,{" "}
+        <span style={{ color: T.accent }}>for everyone.</span>
       </div>
       <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: T.muted, textAlign: "center", marginBottom: 36, maxWidth: 720, lineHeight: 1.6 }}>
-        Non-technical founders use the GUI. Engineers use the CLI with their model of choice.{" "}
+        Non-technical founders use the GUI. Engineers use the CLI with their model of choice.<br />
         <span style={{ color: T.text, fontWeight: 500 }}>Both deploy to Arbitrum. Neither sees the blockchain.</span>
       </div>
 
@@ -558,7 +573,7 @@ function Slide6() {
             <div style={{ color: "#1e2d4a" }}>{"  "}│  Model  : Claude Code (Anthropic)   │</div>
             <div style={{ color: "#1e2d4a" }}>{"  "}└──────────────────────────────────────┘</div>
             <div style={{ color: "#12AAFF", marginTop: 10 }}>{"  "}✓ Contract deployed: 0x7fA3...c291</div>
-            <div style={{ color: "#12AAFF" }}>{"  "}✓ Gas: $0.00 — Paymaster sponsored</div>
+            <div style={{ color: "#12AAFF" }}>{"  "}✓ Gas: $0.00 — sponsored</div>
             <div style={{ color: "#12AAFF" }}>{"  "}✓ Done in 9.2s</div>
           </div>
 
@@ -578,13 +593,12 @@ function Slide6() {
 function Slide7() {
   const rows = [
     { tech: "Arbitrum One", role: "Settlement layer", why: "250ms blocks, Timeboost MEV protection" },
-    { tech: "Timeboost", role: "MEV ordering", why: "Express Lane — 200ms priority advantage" },
-    { tech: "LayerZero OFT", role: "Omnichain bridge", why: "User pays on any chain, settles on Arbitrum" },
-    { tech: "ERC-4337", role: "Account abstraction", why: "No seed phrases — social login, smart recovery" },
-    { tech: "Paymaster", role: "Gas abstraction", why: "Platform sponsors gas — users never see it" },
-    { tech: "Fhenix CoFHE", role: "Privacy layer", why: "Encrypted state — private orders, private games" },
     { tech: "Robinhood Chain", role: "RWA Orbit", why: "Tokenized stocks, compliance at chain layer" },
+    { tech: "ZeroDev", role: "Account abstraction", why: "Session keys, passkeys, ERC-7579 modules, walletless UX native to the stack" },
+    { tech: "LayerZero OFT", role: "Omnichain bridge", why: "User pays on any chain, settles on Arbitrum" },
+    { tech: "Fhenix", role: "Privacy layer", why: "Encrypted state — private orders, private games" },
     { tech: "Slither + AI", role: "Security audit", why: "Static analysis + AI second-pass on every contract" },
+    { tech: "Timeboost", role: "MEV ordering", why: "Express Lane — 200ms priority advantage" },
   ];
 
   return (
@@ -626,16 +640,34 @@ function Slide7() {
 function SlidePartners() {
   const partners = [
     {
+      name: "Arbitrum One",
+      tag: "The Invisible Engine",
+      color: "#00C805",
+      glow: "#00C805",
+      points: [
+        "250ms block times — feels instant.",
+        "Fraction of mainnet cost, same EVM security.",
+      ],
+    },
+    {
+      name: "Robinhood Chain",
+      tag: "Real-World Assets",
+      color: "#12AAFF",
+      glow: "#12AAFF",
+      points: [
+        "Tokenized stocks and RWAs.",
+        "Compliance baked into the chain layer.",
+      ],
+    },
+    {
       name: "ZeroDev",
       tag: "Web2 UX on Web3 Rails",
       color: "#7c3aed",
       glow: "#7c3aed",
-      featured: true,
       points: [
         "No wallets. No seed phrases. No gas popups.",
-        "Session keys let the app act on the user's behalf — milestone releases without signing every tx.",
-        "Social login, smart recovery, one-tap checkout.",
-        "The single biggest reason non-crypto users can actually use this.",
+        "Session keys — app acts on user's behalf without signing every tx.",
+        "Social login, passkeys, one-tap checkout.",
       ],
     },
     {
@@ -643,23 +675,39 @@ function SlidePartners() {
       tag: "You just transfer.",
       color: "#12AAFF",
       glow: "#12AAFF",
-      featured: false,
       points: [
         "Pay on Ethereum, Base, Solana — arrive on Arbitrum.",
         "No bridge UI. No swap step. No 'wrong network' error.",
-        "The user experience: tap a button, it works.",
       ],
     },
     {
-      name: "Arbitrum One",
-      tag: "The Invisible Engine",
-      color: "#00C805",
-      glow: "#00C805",
-      featured: false,
+      name: "Fhenix",
+      tag: "Privacy by Default",
+      color: "#a855f7",
+      glow: "#a855f7",
       points: [
-        "250ms block times — feels instant.",
-        "Fraction of mainnet cost, same EVM security.",
-        "Users never know it's a blockchain.",
+        "Encrypted on-chain state.",
+        "Private orders, hidden game state — without a server.",
+      ],
+    },
+    {
+      name: "Dune",
+      tag: "On-Chain Analytics",
+      color: "#f97316",
+      glow: "#f97316",
+      points: [
+        "Real-time dashboards for every deployed product.",
+        "Query any contract, visualize usage from day one.",
+      ],
+    },
+    {
+      name: "Alchemy",
+      tag: "Web3 Infrastructure",
+      color: "#4F46E5",
+      glow: "#4F46E5",
+      points: [
+        "Reliable RPC for every deployed app.",
+        "Smart account SDK and enhanced APIs out of the box.",
       ],
     },
     {
@@ -667,105 +715,42 @@ function SlidePartners() {
       tag: "MEV? Gone.",
       color: "#f59e0b",
       glow: "#f59e0b",
-      featured: false,
       points: [
-        "Trading bot gets express-lane ordering.",
-        "Front-running eliminated — users get the price they see.",
-      ],
-    },
-    {
-      name: "Fhenix CoFHE",
-      tag: "Privacy by Default",
-      color: "#a855f7",
-      glow: "#a855f7",
-      featured: false,
-      points: [
-        "Encrypted on-chain state.",
-        "Private orders, hidden game state — without a server.",
-      ],
-    },
-    {
-      name: "Robinhood Chain",
-      tag: "Real-World Assets",
-      color: "#00C805",
-      glow: "#00C805",
-      featured: false,
-      points: [
-        "Tokenized stocks and RWAs.",
-        "Compliance baked into the chain layer — not bolted on.",
+        "Express Lane ordering — no front-running.",
+        "Users get the price they see.",
       ],
     },
   ];
-
-  const featured = partners.find((p) => p.featured);
-  const rest = partners.filter((p) => !p.featured);
 
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 64px" }}>
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 8 }}>
         Built With
       </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 36, color: T.text, marginBottom: 36 }}>
+      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 36, color: T.text, marginBottom: 32 }}>
         Partner Integrations
       </div>
 
-      <div style={{ display: "flex", gap: 24, width: "100%", maxWidth: 1200, alignItems: "flex-start" }}>
-
-        {/* Featured: ZeroDev */}
-        <div style={{
-          flex: "0 0 360px",
-          background: `${featured.glow}0d`,
-          border: `1.5px solid ${featured.glow}66`,
-          borderRadius: 20,
-          padding: "32px 36px",
-          boxShadow: `0 0 40px ${featured.glow}18`,
-          position: "relative",
-          overflow: "hidden",
-        }}>
-          <div style={{
-            position: "absolute", top: 0, right: 0,
-            background: featured.glow, color: "#fff",
-            fontFamily: "'DM Mono', monospace", fontSize: 10,
-            letterSpacing: "0.15em", textTransform: "uppercase",
-            padding: "6px 16px", borderBottomLeftRadius: 12,
-          }}>Keystone</div>
-          <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 24, color: featured.color, marginBottom: 4 }}>
-            {featured.name}
-          </div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: T.muted, marginBottom: 20, letterSpacing: "0.05em" }}>
-            {featured.tag}
-          </div>
-          {featured.points.map((pt, i) => (
-            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "flex-start" }}>
-              <div style={{ color: featured.color, fontSize: 16, lineHeight: 1.5, flexShrink: 0 }}>→</div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: T.text, lineHeight: 1.55 }}>{pt}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, width: "100%" }}>
+        {partners.map((p) => (
+          <div key={p.name} style={{
+            background: `${p.glow}08`,
+            border: `1px solid ${T.border}`,
+            borderRadius: 16,
+            padding: "20px 22px",
+          }}>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 17, color: p.color }}>{p.name}</div>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: T.muted, letterSpacing: "0.08em", marginTop: 2 }}>{p.tag}</div>
             </div>
-          ))}
-        </div>
-
-        {/* Rest: 2×2+1 grid */}
-        <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {rest.map((p) => (
-            <div key={p.name} style={{
-              background: `${p.glow}08`,
-              border: `1px solid ${T.border}`,
-              borderRadius: 16,
-              padding: "22px 24px",
-            }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 12 }}>
-                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 17, color: p.color }}>{p.name}</div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: T.muted, letterSpacing: "0.08em" }}>{p.tag}</div>
+            {p.points.map((pt, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 7, alignItems: "flex-start" }}>
+                <div style={{ color: p.color, fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}>·</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.muted, lineHeight: 1.5 }}>{pt}</div>
               </div>
-              {p.points.map((pt, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
-                  <div style={{ color: p.color, fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}>·</div>
-                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: T.muted, lineHeight: 1.5 }}>{pt}</div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -892,9 +877,9 @@ function SlideWaveHook() {
         </div>
 
         {/* Main statement */}
-        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(38px, 5.5vw, 76px)", lineHeight: 1.05, marginBottom: 36 }}>
-          <div style={{ color: T.text }}>A new kind of builder</div>
-          <div style={{ color: T.text }}>is <span style={{ color: T.accent }}>waking up.</span></div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4vw, 56px)", lineHeight: 1.1, marginBottom: 36 }}>
+          <div style={{ color: T.text, whiteSpace: "nowrap" }}>A new kind of builder</div>
+          <div style={{ color: T.text, whiteSpace: "nowrap" }}>is <span style={{ color: T.accent }}>waking up.</span></div>
         </div>
 
         {/* Supporting */}
@@ -919,11 +904,11 @@ function SlideWaveHook() {
 // ─── Slide: The Agentic Wave ───────────────────────────────────────────────────
 
 function SlideAIStats() {
-  const bars = [
-    { label: "Monthly AI users", value: 500, max: 500, unit: "500M+", color: T.accent, sub: "ChatGPT, Gemini, Claude — combined" },
-    { label: "\"Vibe coders\" using AI to build", value: 14, max: 500, unit: "~14M", color: T.amber, sub: "Cursor, Lovable, Replit, GitHub Copilot" },
-    { label: "Active web2 developers", value: 27, max: 500, unit: "27M", color: T.purple, sub: "GitHub active devs, 2024" },
-    { label: "Active web3 / on-chain devs", value: 0.23, max: 500, unit: "23K", color: T.red, sub: "Electric Capital Developer Report, 2024" },
+  const pieData = [
+    { label: "General AI users", unit: "~330M", value: 330, color: "#2a3d5c", sub: "Writing, productivity, general tasks" },
+    { label: "Using AI as search", unit: "~150M", value: 150, color: T.accent, sub: "Info lookup & Q&A — ~30% of all usage" },
+    { label: "AI builders / vibe coders", unit: "~20M", value: 20, color: T.amber, sub: "Cursor, Lovable, Copilot, Bolt (2025)" },
+    { label: "Active on-chain devs", unit: "23K", value: 0.023, color: T.green, sub: "Electric Capital Developer Report, 2024" },
   ];
 
   const wave = [
@@ -935,42 +920,84 @@ function SlideAIStats() {
     { name: "VibeBlock", act: "Your Arbitrum co-pilot — scaffold the hard parts, iterate to ship", highlight: true },
   ];
 
+  // Donut chart geometry
+  const SZ = 200, CX = 100, CY = 100, R_OUT = 88, R_IN = 52, GAP = 2;
+
+  const ptc = (angleDeg, r) => {
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: CX + r * Math.cos(rad), y: CY + r * Math.sin(rad) };
+  };
+
+  const arcPath = (startA, endA) => {
+    const so = ptc(startA, R_OUT), eo = ptc(endA, R_OUT);
+    const si = ptc(startA, R_IN), ei = ptc(endA, R_IN);
+    const large = (endA - startA) > 180 ? 1 : 0;
+    return `M ${so.x.toFixed(2)} ${so.y.toFixed(2)} A ${R_OUT} ${R_OUT} 0 ${large} 1 ${eo.x.toFixed(2)} ${eo.y.toFixed(2)} L ${ei.x.toFixed(2)} ${ei.y.toFixed(2)} A ${R_IN} ${R_IN} 0 ${large} 0 ${si.x.toFixed(2)} ${si.y.toFixed(2)} Z`;
+  };
+
+  // Compute angles; boost tiny segments (min 4°), subtract from largest
+  const TOTAL = pieData.reduce((s, d) => s + d.value, 0);
+  const MIN_DEG = 4;
+  const rawDegs = pieData.map(d => (d.value / TOTAL) * 360);
+  const adjDegs = [...rawDegs];
+  rawDegs.forEach((deg, i) => {
+    if (deg < MIN_DEG && deg > 0) { adjDegs[0] -= (MIN_DEG - deg); adjDegs[i] = MIN_DEG; }
+  });
+  let cur = 0;
+  const segments = pieData.map((d, i) => {
+    const startA = cur + GAP / 2, endA = cur + adjDegs[i] - GAP / 2;
+    cur += adjDegs[i];
+    return { ...d, startA, endA };
+  });
+
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 72px" }}>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 12 }}>
-        The Agentic Wave
-      </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 42px)", marginBottom: 8, lineHeight: 1.1 }}>
-        500 million people use AI.
-        <span style={{ color: T.accent }}> Most just ask questions.</span>
-      </div>
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: T.muted, marginBottom: 40 }}>
-        The builders are next — and on-chain has no on-ramp for them.
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", marginBottom: 40, padding: "0 72px" }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 12 }}>
+          The Agentic Wave
+        </div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 42px)", marginBottom: 8, lineHeight: 1.3 }}>
+          500 million people use AI.<br />
+          <span style={{ color: T.accent }}>Most just ask questions.</span>
+        </div>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: T.muted }}>
+          The builders are next — and on-chain has no on-ramp for them.
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: 48, alignItems: "flex-start" }}>
-        {/* Left: Bar chart */}
+      <div style={{ display: "flex", gap: 48, alignItems: "flex-start", padding: "0 72px" }}>
+        {/* Left: Donut chart + legend */}
         <div style={{ flex: 1.4 }}>
           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: T.muted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16 }}>Who's online</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            {bars.map((b) => {
-              const pct = Math.max((b.value / b.max) * 100, 0.5);
-              return (
-                <div key={b.label}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.text }}>{b.label}</div>
-                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 18, color: b.color, marginLeft: 12, flexShrink: 0 }}>{b.unit}</div>
+
+          <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+            {/* SVG Donut */}
+            <div style={{ flexShrink: 0 }}>
+              <svg width={SZ} height={SZ}>
+                {segments.map((seg, i) => (
+                  <path key={i} d={arcPath(seg.startA, seg.endA)} fill={seg.color} opacity={0.92} />
+                ))}
+                <text x={CX} y={CY - 6} textAnchor="middle" fill={T.text} fontFamily="Syne, sans-serif" fontWeight={800} fontSize={20}>500M</text>
+                <text x={CX} y={CY + 12} textAnchor="middle" fill={T.muted} fontFamily="DM Mono, monospace" fontSize={9} letterSpacing="1.5">TOTAL USERS</text>
+              </svg>
+            </div>
+
+            {/* Legend */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
+              {pieData.map((d) => (
+                <div key={d.label}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: 2, background: d.color, flexShrink: 0 }} />
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.text, flex: 1 }}>{d.label}</div>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 15, color: d.color }}>{d.unit}</div>
                   </div>
-                  <div style={{ height: 10, background: T.border, borderRadius: 6, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${pct}%`, background: b.color, borderRadius: 6, opacity: 0.85 }} />
-                  </div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: T.muted, marginTop: 4 }}>{b.sub}</div>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: T.muted, marginLeft: 18 }}>{d.sub}</div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          <div style={{ marginTop: 28, background: T.surface, border: `1px solid ${T.accent}33`, borderRadius: 14, padding: "14px 20px" }}>
+          <div style={{ marginTop: 24, background: T.surface, border: `1px solid ${T.accent}33`, borderRadius: 14, padding: "14px 20px" }}>
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: T.muted, lineHeight: 1.7 }}>
               Web2 devs outnumber web3 devs{" "}
               <span style={{ color: T.accent, fontWeight: 700, fontSize: 17 }}>1,174×</span>.{" "}
@@ -990,7 +1017,6 @@ function SlideAIStats() {
                 background: w.highlight ? `${T.accent}14` : i % 2 === 0 ? T.surface : "transparent",
                 borderRadius: w.highlight ? 12 : 0,
                 border: w.highlight ? `1px solid ${T.accent}44` : "none",
-                marginBottom: w.highlight ? 0 : 0,
               }}>
                 <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 15, color: w.highlight ? T.accent : T.text, minWidth: 88, flexShrink: 0 }}>{w.name}</div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: w.highlight ? T.text : T.muted }}>{w.act}</div>
@@ -1062,19 +1088,22 @@ function SlideRoadmap() {
   ];
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 72px" }}>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 12 }}>
-        Roadmap
-      </div>
-      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 40px)", marginBottom: 6, lineHeight: 1.1 }}>
-        Maximum security. Minimum friction.
-        <span style={{ color: T.accent }}> Every step of the way.</span>
-      </div>
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: T.muted, marginBottom: 36 }}>
-        The audit gets deeper, the contracts get safer, the UX stays invisible.
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", marginBottom: 36, padding: "0 72px" }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 12 }}>
+          Roadmap
+        </div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 40px)", marginBottom: 6, lineHeight: 1.3 }}>
+          Maximum security.<br />
+          Minimum friction.<br />
+          <span style={{ color: T.accent }}>Every step of the way.</span>
+        </div>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: T.muted }}>
+          The audit gets deeper, the contracts get safer, the UX stays invisible.
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, padding: "0 72px" }}>
         {phases.map((p) => (
           <div key={p.tag} style={{ background: T.surface, border: `1px solid ${p.color}44`, borderRadius: 16, padding: "24px 22px", display: "flex", flexDirection: "column", gap: 0 }}>
             <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: p.color, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 8 }}>{p.tag}</div>
@@ -1091,12 +1120,24 @@ function SlideRoadmap() {
         ))}
       </div>
 
-      <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
+      <div style={{ marginTop: 24, display: "flex", justifyContent: "center", padding: "0 72px" }}>
         <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: T.muted, textAlign: "center", lineHeight: 1.7, maxWidth: 800 }}>
           The goal isn't more DeFi protocols. It's{" "}
           <span style={{ color: T.text, fontWeight: 600 }}>the next generation of everyday products</span>
           {" "}— healthcare, freelancing, gaming, logistics — running on Arbitrum because it's the best infrastructure, not because the builder knew it was there.
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Slide: Arbitrum Everywhere ───────────────────────────────────────────────
+
+function SlideArbitrumEverywhere() {
+  return (
+    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(48px, 7vw, 96px)", color: T.text, lineHeight: 1 }}>
+        Arbitrum <span style={{ color: T.accent }}>Everywhere.</span>
       </div>
     </div>
   );
@@ -1130,6 +1171,7 @@ export default function VibeBlockPitch() {
     <Slide7 key={8} />,
     <SlidePartners key={9} />,
     <SlideRoadmap key={10} />,
+    <SlideArbitrumEverywhere key={11} />,
   ];
 
   return (
