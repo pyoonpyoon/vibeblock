@@ -1844,13 +1844,11 @@ function DeployPanel({ demoType }) {
   async function ship() {
     setPhase("shipping"); setErrMsg(null);
     try {
-      const { createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient } =
-        await import("@zerodev/sdk");
-      const { toPasskeyValidator, toWebAuthnKey, WebAuthnMode } =
-        await import("@zerodev/passkey-validator");
-      const { KERNEL_V3_1 } = await import("@zerodev/sdk/constants");
-      const { http, createPublicClient } = await import("viem");
-      const { arbitrumSepolia } = await import("viem/chains");
+      const {
+        createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient,
+        KERNEL_V3_1, toPasskeyValidator, toWebAuthnKey, WebAuthnMode,
+        http, createPublicClient, arbitrumSepolia,
+      } = await import("virtual:zerodev");
 
       const PROJECT_ID    = "3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb";
       const BUNDLER_RPC   = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/421614`;
