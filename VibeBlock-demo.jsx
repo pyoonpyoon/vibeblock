@@ -2429,6 +2429,7 @@ function CliPanel({ onClose }) {
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("terminal");
   const [activeActivity, setActiveActivity] = useState("explorer");
+  const [activeSession, setActiveSession] = useState("vibeblock");
   const bottomRef = useRef(null);
   const modelRef = useRef(null);
 
@@ -2692,59 +2693,109 @@ function CliPanel({ onClose }) {
                 )
               )}
 
-              <button onClick={onClose} style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", fontSize: 18, padding: "0 4px", lineHeight: 1 }}>×</button>
+              {/* VS Code terminal action buttons */}
+              <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #1a2e1a", marginLeft: 4, paddingLeft: 8, gap: 0 }}>
+                {[
+                  { title: "New Terminal",   label: "+" },
+                  { title: "Launch Profile", label: "∨" },
+                  { title: "More Actions",   label: "···" },
+                  { title: "Split Terminal", label: "⊟" },
+                ].map(({ title, label }) => (
+                  <button key={title} title={title} style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", padding: "3px 7px", fontSize: 13, lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{label}</button>
+                ))}
+                <div style={{ width: 1, height: 13, background: "#1a2e1a", margin: "0 6px" }} />
+                <button onClick={onClose} title="Close Panel" style={{ background: "none", border: "none", color: "#3a5a3a", cursor: "pointer", padding: "2px 5px", fontSize: 17, lineHeight: 1 }}>×</button>
+              </div>
             </div>
           </div>
 
-          {/* ── Content area ─────────────────────────────────────────── */}
-          <div style={{ flex: 1, overflow: "auto", padding: "14px 20px", fontFamily: "'DM Mono',monospace", fontSize: 13, lineHeight: 1.8 }}>
+          {/* ── Content area + Terminal Instances sidebar ─────────────── */}
+          <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
-            {activeTab === "terminal" && (
-              <>
-                {!selectedModel && <div style={{ color: "#3a5a3a" }}>Select a model to get started.</div>}
-                {selectedModel && !connected && (
-                  <div style={{ color: "#3a5a3a" }}>
-                    Enter your {selectedModel.label} API key and press <span style={{ color: "#00C805" }}>Connect</span>.
-                  </div>
-                )}
-                {displayedLines.map((line, i) => (
-                  <div key={i} style={{ color: lineColor(line.type), whiteSpace: "pre" }}>
-                    {line.type === "cursor"
-                      ? <span>$ <span style={{ animation: "cliBlink 1s step-end infinite" }}>▌</span></span>
-                      : line.text}
-                  </div>
-                ))}
-                <div ref={bottomRef} />
-              </>
-            )}
+            {/* Scrollable terminal content */}
+            <div style={{ flex: 1, overflow: "auto", padding: "14px 20px", fontFamily: "'DM Mono',monospace", fontSize: 13, lineHeight: 1.8 }}>
 
-            {activeTab === "problems" && (
-              <div>
-                {problems.length === 0 && (
-                  <div style={{ color: "#3a5a3a" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
-                )}
-                {problems.map((p, i) => (
-                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1a2e1a33" }}>
-                    <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a8a6a", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
-                      {p.severity === "warning" ? "⚠" : "ℹ"}
-                    </span>
-                    <div>
-                      <div style={{ color: "#c8d0d8", fontSize: 13 }}>{p.message}</div>
-                      <div style={{ color: "#3a5a3a", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
+              {activeTab === "terminal" && (
+                <>
+                  {!selectedModel && <div style={{ color: "#3a5a3a" }}>Select a model to get started.</div>}
+                  {selectedModel && !connected && (
+                    <div style={{ color: "#3a5a3a" }}>
+                      Enter your {selectedModel.label} API key and press <span style={{ color: "#00C805" }}>Connect</span>.
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  )}
+                  {displayedLines.map((line, i) => (
+                    <div key={i} style={{ color: lineColor(line.type), whiteSpace: "pre" }}>
+                      {line.type === "cursor"
+                        ? <span>$ <span style={{ animation: "cliBlink 1s step-end infinite" }}>▌</span></span>
+                        : line.text}
+                    </div>
+                  ))}
+                  <div ref={bottomRef} />
+                </>
+              )}
 
-            {activeTab === "output" && (
-              <div>
-                {outputLogs.length === 0 && <div style={{ color: "#3a5a3a" }}>No output yet.</div>}
-                {outputLogs.map((line, i) => (
-                  <div key={i} style={{ color: "#4a6a5a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
-                ))}
-              </div>
-            )}
+              {activeTab === "problems" && (
+                <div>
+                  {problems.length === 0 && (
+                    <div style={{ color: "#3a5a3a" }}>{isDone ? "No problems detected." : "Run the generation to see problems."}</div>
+                  )}
+                  {problems.map((p, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "7px 0", borderBottom: "1px solid #1a2e1a33" }}>
+                      <span style={{ color: p.severity === "warning" ? "#f59e0b" : "#3a8a6a", fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>
+                        {p.severity === "warning" ? "⚠" : "ℹ"}
+                      </span>
+                      <div>
+                        <div style={{ color: "#c8d0d8", fontSize: 13 }}>{p.message}</div>
+                        <div style={{ color: "#3a5a3a", fontSize: 11, marginTop: 2 }}>{p.file} · line {p.line}, col {p.col}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === "output" && (
+                <div>
+                  {outputLogs.length === 0 && <div style={{ color: "#3a5a3a" }}>No output yet.</div>}
+                  {outputLogs.map((line, i) => (
+                    <div key={i} style={{ color: "#4a6a5a", whiteSpace: "pre", fontSize: 12, lineHeight: 1.7 }}>{line}</div>
+                  ))}
+                </div>
+              )}
+
+            </div>
+
+            {/* ── Terminal Instances Sidebar ──────────────────────────── */}
+            <div style={{
+              width: 148, flexShrink: 0,
+              borderLeft: "1px solid #1a2e1a",
+              background: "#060c06",
+              display: "flex", flexDirection: "column",
+              overflowY: "auto",
+            }}>
+              {[
+                { id: "vibeblock", name: "vibeblock — zsh",  active: true },
+                { id: "node",      name: "node",              active: false },
+              ].map(sess => (
+                <button key={sess.id} onClick={() => setActiveSession(sess.id)} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "8px 10px",
+                  background: activeSession === sess.id ? "#1a2e1a" : "none",
+                  border: "none",
+                  borderLeft: `2px solid ${activeSession === sess.id ? "#00C805" : "transparent"}`,
+                  cursor: "pointer", textAlign: "left", width: "100%",
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke={activeSession === sess.id ? "#00C805" : "#3a5a3a"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="1" width="14" height="14" rx="2"/>
+                    <polyline points="4,5 7,8 4,11"/><line x1="8" y1="11" x2="12" y2="11"/>
+                  </svg>
+                  <span style={{
+                    fontFamily: "'DM Mono',monospace", fontSize: 11,
+                    color: activeSession === sess.id ? "#c8d0d8" : "#3a5a3a",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>{sess.name}</span>
+                </button>
+              ))}
+            </div>
 
           </div>
         </div>
@@ -2774,6 +2825,13 @@ function CliPanel({ onClose }) {
           <span>UTF-8</span>
           <span>Solidity</span>
           <span style={{ background: "#ffffff22", padding: "1px 7px", borderRadius: 3 }}>Arbitrum Sepolia</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Prettier
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
         </div>
       </div>
     </div>
