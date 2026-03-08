@@ -70,6 +70,24 @@ Crypto is invisible to end users. They see dollars and buttons, never wallets or
 - `VibeBlock` (main) — state: `stage`, `prompt`, `demoId`, `product`, `darkMode`, `cliOpen`, `panelHeight`, `sidebarOpen`
 - Model dropdown in CliPanel opens DOWNWARD (top: calc(100%+6px)) — overflow:hidden parent clips upward
 
+## Deploy Panel — Key Details (lines ~1797–1968)
+- `DEPLOY_DATA` — 4 contracts: `bot` (ApexTradingBot), `escrow` (ScopeEscrow), `game` (BrainBlastGame), `marketplace` (TradeportEscrow)
+- State: `phase` (idle/connecting/connected/switching/deploying/pending/done/err), `walletAddr`, `networkOk`, `txHash`, `contractAddr`, `errMsg`
+- `connect()` — ethers v6 BrowserProvider, checks chainId === 421614 (ARB_CHAIN)
+- `deployContract()` — ContractFactory + `feeData.maxFeePerGas * 2n` override (prevents "base fee" error on Arbitrum Sepolia)
+- `friendlyErr()` — maps raw error messages to plain-English user-facing strings
+- Deployed TradeportEscrow: `0x8c69BF30bc0848cFe7b91489Ab4f9bF7D522e216` on Arbitrum Sepolia
+- ethers imported dynamically: `await import("https://esm.sh/ethers@6")`
+
+## ZeroDev Integration (NEXT TASK — not yet implemented)
+- Goal: replace MetaMask/BrowserProvider with passkey (fingerprint/FaceID) via ZeroDev
+- Project ID: `3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb` (Arbitrum Sepolia, chainId 421614)
+- RPC: `https://rpc.zerodev.app/api/v3/3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb/chain/421614`
+- Passkey Server: `https://passkeys.zerodev.app/api/v3/3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb`
+- Packages needed: `@zerodev/sdk`, `@zerodev/passkey-validator`, `permissionless`, `viem`
+- Flow: "Connect Wallet" → `toWebAuthnKey` → `toPasskeyValidator` → `createKernelAccount` → fingerprint prompt → deploy via bundler (gas sponsored)
+- Replace ~30 lines in `connect()` and `deployContract()` functions
+
 ## Vite / Build Notes
 - `resolve: { dedupe: ["react","react-dom"] }` in vite.config.js — required so files outside preview/ can resolve React
 - Screenshot tool: puppeteer installed in preview/ — use Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
