@@ -2417,7 +2417,7 @@ const CLI_LINES = [
   { delay: 5600, text: "$ _", type: "cursor" },
 ];
 
-function CliPanel({ onClose, panelHeight, setPanelHeight }) {
+function CliPanel({ onClose, panelHeight, setPanelHeight, sidebarOpen }) {
   const [selectedModel, setSelectedModel] = useState(null);
   const [customModels, setCustomModels] = useState([]);
   const [addingModel, setAddingModel] = useState(false);
@@ -2610,12 +2610,13 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
 
   return (
     <div style={{
-      position: "fixed", bottom: 0, left: 0, right: 0,
+      position: "fixed", bottom: 0, left: sidebarOpen ? 272 : 0, right: 0,
       height: panelHeight, zIndex: 300,
       background: "#000000",
       borderTop: "1px solid #1e2d4a",
       boxShadow: "0 -16px 64px rgba(18,170,255,0.06)",
       display: "flex", flexDirection: "column",
+      transition: "left 0.25s cubic-bezier(0.4,0,0.2,1)",
       animation: "cliSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
     }}>
       <style>{`
@@ -3687,7 +3688,7 @@ export default function VibeBlock() {
       </button>
 
       {/* CLI panel */}
-      {cliOpen && <CliPanel onClose={() => setCliOpen(false)} panelHeight={panelHeight} setPanelHeight={setPanelHeight} />}
+      {cliOpen && <CliPanel onClose={() => setCliOpen(false)} panelHeight={panelHeight} setPanelHeight={setPanelHeight} sidebarOpen={sidebarOpen} />}
     </div>
   );
 }
