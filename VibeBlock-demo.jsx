@@ -2455,6 +2455,15 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
 
   const closeDropdown = () => { setOpenDropdown(null); setHoveredItem(null); };
 
+  // Activity sidebar state
+  const [expandedFolders, setExpandedFolders] = useState(new Set(["contracts", "frontend", "scripts"]));
+  const [searchQuery, setSearchQuery] = useState("");
+  const toggleFolder = (name) => setExpandedFolders(prev => {
+    const next = new Set(prev);
+    next.has(name) ? next.delete(name) : next.add(name);
+    return next;
+  });
+
   useEffect(() => {
     const handler = (e) => {
       if (modelRef.current && !modelRef.current.contains(e.target)) setModelOpen(false);
@@ -2644,16 +2653,158 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
           alignItems: "center", paddingTop: 6, gap: 2,
         }}>
           {ACTIVITY_ICONS.map(act => (
-            <button key={act.id} onClick={() => setActiveActivity(act.id)} title={act.label} style={{
-              width: 44, height: 44,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "none", border: "none",
-              borderLeft: `2px solid ${activeActivity === act.id ? "#12AAFF" : "transparent"}`,
-              color: activeActivity === act.id ? "#c8d0d8" : "#375280",
-              cursor: "pointer", transition: "color 0.15s",
-            }}>{act.icon}</button>
+            <button key={act.id}
+              onClick={() => setActiveActivity(a => a === act.id ? null : act.id)}
+              title={act.label} style={{
+                width: 44, height: 44,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "none", border: "none",
+                borderLeft: `2px solid ${activeActivity === act.id ? "#12AAFF" : "transparent"}`,
+                color: activeActivity === act.id ? "#c8d0d8" : "#375280",
+                cursor: "pointer", transition: "color 0.15s",
+              }}>{act.icon}</button>
           ))}
         </div>
+
+        {/* ── Activity Sidebar Panel ───────────────────────────────────── */}
+        {activeActivity && (() => {
+          const panelFiles = isDone ? [
+            { kind: "folder", name: "contracts",  depth: 0 },
+            { kind: "file",   name: "TradeportEscrow.sol", depth: 1, ext: "sol" },
+            { kind: "folder", name: "frontend",   depth: 0 },
+            { kind: "file",   name: "App.jsx",    depth: 1, ext: "jsx" },
+            { kind: "file",   name: "index.html", depth: 1, ext: "html" },
+            { kind: "folder", name: "scripts",    depth: 0 },
+            { kind: "file",   name: "deploy.js",  depth: 1, ext: "js" },
+            { kind: "file",   name: "foundry.toml", depth: 0, ext: "toml" },
+            { kind: "file",   name: "package.json", depth: 0, ext: "json" },
+          ] : [];
+
+          const extColor = { sol: "#12AAFF", jsx: "#61dafb", html: "#e34c26", js: "#f7df1e", toml: "#9b59b6", json: "#00C805" };
+
+          const PanelLabel = ({ children }) => (
+            <div style={{ padding: "10px 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", letterSpacing: "0.18em", textTransform: "uppercase", userSelect: "none" }}>{children}</div>
+          );
+
+          return (
+            <div style={{ width: 220, flexShrink: 0, borderRight: "1px solid #1e2d4a", background: "#000000", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+              {/* EXPLORER */}
+              {activeActivity === "explorer" && (
+                <div style={{ flex: 1, overflowY: "auto" }}>
+                  <PanelLabel>Explorer</PanelLabel>
+                  {!isDone && (
+                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280", lineHeight: 1.6 }}>
+                      No folder open.<br />Connect a model and run to scaffold your project.
+                    </div>
+                  )}
+                  {panelFiles.map((f, i) => {
+                    const isOpen = expandedFolders.has(f.name);
+                    if (f.kind === "file") {
+                      const parentFolder = panelFiles.slice(0, i).reverse().find(p => p.kind === "folder" && p.depth < f.depth);
+                      if (parentFolder && !expandedFolders.has(parentFolder.name)) return null;
+                    }
+                    return (
+                      <div key={i} onClick={() => f.kind === "folder" && toggleFolder(f.name)}
+                        style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px 3px", paddingLeft: 8 + f.depth * 16, cursor: f.kind === "folder" ? "pointer" : "default", userSelect: "none" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#ffffff08"}
+                        onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                        {f.kind === "folder" ? (
+                          <>
+                            <span style={{ color: "#375280", fontSize: 9, width: 10 }}>{isOpen ? "▼" : "▶"}</span>
+                            <span style={{ color: "#c8d0d8", fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ width: 10 }} />
+                            <span style={{ width: 8, height: 8, borderRadius: 2, background: extColor[f.ext] || "#375280", flexShrink: 0 }} />
+                            <span style={{ color: "#8a9ab8", fontFamily: "'DM Sans',sans-serif", fontSize: 12 }}>{f.name}</span>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* SEARCH */}
+              {activeActivity === "search" && (
+                <div style={{ flex: 1, overflowY: "auto" }}>
+                  <PanelLabel>Search</PanelLabel>
+                  <div style={{ padding: "0 8px 8px" }}>
+                    <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                      placeholder="Search terminal…"
+                      style={{ width: "100%", background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#c8d0d8", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  {searchQuery && CLI_LINES.filter(l => l.text.toLowerCase().includes(searchQuery.toLowerCase()) && l.text.trim()).map((l, i) => (
+                    <div key={i} style={{ padding: "4px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#8a9ab8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {l.text.replace(new RegExp(`(${searchQuery})`, "gi"), "«$1»")}
+                    </div>
+                  ))}
+                  {searchQuery && !CLI_LINES.some(l => l.text.toLowerCase().includes(searchQuery.toLowerCase())) && (
+                    <div style={{ padding: "8px 12px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280" }}>No results.</div>
+                  )}
+                </div>
+              )}
+
+              {/* SOURCE CONTROL */}
+              {activeActivity === "git" && (
+                <div style={{ flex: 1, overflowY: "auto" }}>
+                  <PanelLabel>Source Control</PanelLabel>
+                  {isDone ? (
+                    <>
+                      <div style={{ padding: "0 8px 8px" }}>
+                        <input placeholder="Message (⌘↵ to commit)" style={{ width: "100%", background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 4, padding: "5px 8px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: "#c8d0d8", outline: "none", boxSizing: "border-box" }} />
+                      </div>
+                      <div style={{ padding: "0 12px 4px", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280", letterSpacing: "0.1em" }}>CHANGES (3)</div>
+                      {[
+                        { status: "U", name: "TradeportEscrow.sol", color: "#00C805" },
+                        { status: "U", name: "App.jsx",             color: "#00C805" },
+                        { status: "U", name: "deploy.js",           color: "#00C805" },
+                      ].map(f => (
+                        <div key={f.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "3px 12px" }}
+                          onMouseEnter={e => e.currentTarget.style.background = "#ffffff08"}
+                          onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#8a9ab8" }}>{f.name}</span>
+                          <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: f.color }}>{f.status}</span>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div style={{ padding: "20px 16px", fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#375280" }}>No changes detected.</div>
+                  )}
+                </div>
+              )}
+
+              {/* EXTENSIONS */}
+              {activeActivity === "extensions" && (
+                <div style={{ flex: 1, overflowY: "auto" }}>
+                  <PanelLabel>Extensions</PanelLabel>
+                  {[
+                    { name: "Solidity",       version: "0.0.161", stars: 5, featured: false },
+                    { name: "Prettier",       version: "10.4.0",  stars: 5, featured: false },
+                    { name: "ESLint",         version: "3.0.5",   stars: 4, featured: false },
+                    { name: "VibeBlock CLI",  version: "1.0.0",   stars: 5, featured: true  },
+                  ].map(ext => (
+                    <div key={ext.name} style={{ padding: "8px 12px", borderBottom: "1px solid #1e2d4a22" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
+                      onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: ext.featured ? "#12AAFF" : "#c8d0d8", fontWeight: ext.featured ? 600 : 400 }}>{ext.name}</span>
+                        {ext.featured && <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "#12AAFF", background: "#12AAFF18", border: "1px solid #12AAFF44", borderRadius: 3, padding: "1px 5px" }}>featured</span>}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#375280" }}>v{ext.version}</span>
+                        <span style={{ fontSize: 10, color: "#f59e0b", letterSpacing: 1 }}>{"★".repeat(ext.stars)}{"☆".repeat(5 - ext.stars)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
 
         {/* ── Main Panel ───────────────────────────────────────────────── */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
