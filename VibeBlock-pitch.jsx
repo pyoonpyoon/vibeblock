@@ -187,68 +187,60 @@ function Slide3() {
   const CW = 2; // corner bracket weight
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "24px 64px 20px" }}>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", marginBottom: 20, flexShrink: 0 }}>
-        The Solution
+    <div style={{ width: "100%", height: "100%", display: "flex", gap: 40, padding: "32px 64px" }}>
+
+      {/* Left: 3-step cards — vertically centered */}
+      <div style={{ flex: "0 0 34%", display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>
+        {cards.map((card, i) => (
+          <div key={card.num}>
+            <div style={{
+              background: card.highlight ? `${T.accent}0d` : T.surface,
+              border: `1px solid ${card.highlight ? T.accent : T.border}`,
+              borderRadius: 16, padding: "20px 24px",
+              display: "flex", flexDirection: "column",
+            }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: card.color, letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>{card.num}</div>
+              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 22, color: T.text, marginBottom: 6, lineHeight: 1.2 }}>{card.label}</div>
+              <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{card.detail}</div>
+            </div>
+            {i < cards.length - 1 && (
+              <div style={{ fontSize: 20, color: T.muted, textAlign: "center", padding: "6px 0" }}>↓</div>
+            )}
+          </div>
+        ))}
       </div>
 
-      <div style={{ display: "flex", gap: 40, flex: 1, minHeight: 0, marginBottom: 14 }}>
+      {/* Right: label + screenshot + tagline, all centered */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, minHeight: 0 }}>
 
-        {/* Left: 3-step cards — vertically centered */}
-        <div style={{ flex: "0 0 36%", display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>
-          {cards.map((card, i) => (
-            <div key={card.num}>
-              <div style={{
-                background: card.highlight ? `${T.accent}0d` : T.surface,
-                border: `1px solid ${card.highlight ? T.accent : T.border}`,
-                borderRadius: 16, padding: "20px 24px",
-                display: "flex", flexDirection: "column",
-              }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: card.color, letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>{card.num}</div>
-                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 22, color: T.text, marginBottom: 6, lineHeight: 1.2 }}>{card.label}</div>
-                <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{card.detail}</div>
-              </div>
-              {i < cards.length - 1 && (
-                <div style={{ fontSize: 20, color: T.muted, textAlign: "center", padding: "6px 0" }}>↓</div>
-              )}
-            </div>
-          ))}
-          <div style={{ marginTop: 20 }}>
-            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 17, lineHeight: 1.5 }}>
-              <span style={{ color: T.green }}>User sees: an app.</span>
-              <br />
-              <span style={{ color: T.muted, fontSize: 14 }}>Nobody sees: the blockchain.</span>
-            </div>
+        {/* "The Solution" — centered above screenshot */}
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: "0.25em", color: T.accent, textTransform: "uppercase", textAlign: "center" }}>
+          The Solution
+        </div>
+
+        {/* Screenshot with corner brackets */}
+        <div style={{ position: "relative", width: "100%" }}>
+          <div style={{ position: "absolute", top: -6, left: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+          <div style={{ position: "absolute", top: -6, right: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+          <div style={{ position: "absolute", bottom: -6, left: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+          <div style={{ position: "absolute", bottom: -6, right: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
+          <div style={{ position: "absolute", inset: -1, borderRadius: 12, boxShadow: `0 0 40px ${T.accent}18, 0 0 0 1px ${T.border}`, pointerEvents: "none", zIndex: 1 }} />
+          <img src="/vb-screenshot-light.png" alt="VibeBlock front page" style={{ width: "100%", display: "block", borderRadius: 10, objectFit: "cover", objectPosition: "top" }} />
+        </div>
+
+        {/* Tagline — centered below screenshot */}
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(20px, 2.2vw, 32px)", lineHeight: 1.2 }}>
+            <span style={{ color: T.green }}>User sees: an app.</span>
+            {"  "}
+            <span style={{ color: T.muted }}>Nobody sees: the blockchain.</span>
+          </div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: T.muted, marginTop: 8, lineHeight: 1.6 }}>
+            Not magic — months of blockchain infrastructure, eliminated from day one.{" "}
+            <span style={{ color: T.text, fontWeight: 500 }}>The product iteration is still yours.</span>
           </div>
         </div>
 
-        {/* Right: actual screenshot with corner brackets — vertically centered */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0 }}>
-          <div style={{ position: "relative", width: "100%", maxHeight: "100%" }}>
-
-            {/* Corner brackets */}
-            <div style={{ position: "absolute", top: -6, left: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
-            <div style={{ position: "absolute", top: -6, right: -6, width: C, height: C, borderTop: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
-            <div style={{ position: "absolute", bottom: -6, left: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderLeft: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
-            <div style={{ position: "absolute", bottom: -6, right: -6, width: C, height: C, borderBottom: `${CW}px solid ${T.accent}`, borderRight: `${CW}px solid ${T.accent}`, zIndex: 2 }} />
-
-            {/* Subtle glow behind image */}
-            <div style={{ position: "absolute", inset: -1, borderRadius: 12, boxShadow: `0 0 40px ${T.accent}18, 0 0 0 1px ${T.border}`, pointerEvents: "none", zIndex: 1 }} />
-
-            {/* Screenshot */}
-            <img
-              src="/vb-screenshot-light.png"
-              alt="VibeBlock front page"
-              style={{ width: "100%", display: "block", borderRadius: 10, objectFit: "cover", objectPosition: "top" }}
-            />
-          </div>
-        </div>
-
-      </div>
-
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.muted, flexShrink: 0 }}>
-        Not magic — months of blockchain infrastructure, eliminated from day one.{" "}
-        <span style={{ color: T.text, fontWeight: 500 }}>The product iteration is still yours.</span>
       </div>
     </div>
   );
