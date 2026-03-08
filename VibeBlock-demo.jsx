@@ -2875,7 +2875,7 @@ function CliPanel({ onClose, panelHeight, setPanelHeight }) {
                     {!connected && <span style={{ fontSize: 8, opacity: 0.5 }}>{modelOpen ? "▲" : "▼"}</span>}
                   </button>
                   {modelOpen && (
-                    <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: 0, background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 -8px 24px rgba(0,0,0,0.5)" }}>
+                    <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#0d1626", border: "1px solid #1e2d4a", borderRadius: 10, padding: 6, minWidth: 170, zIndex: 500, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
                       {allModels.map(m => (
                         <button key={m.id} onClick={() => { setSelectedModel(m); setModelOpen(false); setApiKey(""); setConnected(false); setVisibleLines(0); setRunning(false); }}
                           style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: selectedModel?.id === m.id ? "#12AAFF12" : "none", border: "none", borderRadius: 7, padding: "7px 12px", fontFamily: "'DM Mono',monospace", fontSize: 11, color: selectedModel?.id === m.id ? "#12AAFF" : "#6b7a99", cursor: "pointer", textAlign: "left" }}>
@@ -3194,6 +3194,140 @@ function DocsDropdown() {
   );
 }
 
+// ─── APP SIDEBAR ──────────────────────────────────────────────────────────────
+function AppSidebar({ open, onClose, onNewChat, onProject }) {
+  const RECENTS = [
+    { label: "Tokenized real estate fund", emoji: "🏠", time: "2h ago", demoId: null, prompt: "I want to build a tokenized real estate investment fund where anyone can invest with $10" },
+    { label: "DeFi savings account", emoji: "💰", time: "Yesterday", demoId: null, prompt: "I want a savings account that automatically earns yield on stablecoins with no minimum" },
+    { label: "Play-to-Earn Game", emoji: "🎮", time: "2d ago", demoId: "game" },
+    { label: "P2P Sneaker Marketplace", emoji: "👟", time: "3d ago", demoId: "marketplace" },
+    { label: "Freelancer escrow platform", emoji: "🤝", time: "5d ago", demoId: "escrow" },
+    { label: "MEV trading bot", emoji: "⚡", time: "1w ago", demoId: "bot" },
+  ];
+
+  const FOLDERS = [
+    { label: "DeFi Projects", count: 4, color: "#12AAFF" },
+    { label: "GameFi", count: 2, color: "#a855f7" },
+    { label: "Infrastructure", count: 3, color: "#f59e0b" },
+  ];
+
+  const [expanded, setExpanded] = useState({ recents: true, projects: true, folders: false });
+  const toggle = (k) => setExpanded(s => ({ ...s, [k]: !s[k] }));
+
+  const SectionHeader = ({ label, skey }) => (
+    <button onClick={() => toggle(skey)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, padding: "10px 16px 6px", background: "none", border: "none", cursor: "pointer", color: "#375280", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}
+      onMouseEnter={e => e.currentTarget.style.color = "#8ca0bf"}
+      onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+    >
+      <span style={{ fontSize: 9, transform: expanded[skey] ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s", display: "inline-block", lineHeight: 1 }}>▶</span>
+      {label}
+    </button>
+  );
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 199, opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 0.2s" }} />
+      <div style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: 272, background: "#000", borderRight: "1px solid #1e2d4a", zIndex: 200, transform: open ? "translateX(0)" : "translateX(-272px)", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", fontFamily: "'DM Mono',monospace" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "18px 16px 14px", borderBottom: "1px solid #1e2d4a", flexShrink: 0 }}>
+          <div style={{ width: 24, height: 24, background: "#12AAFF", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px #12AAFF44", flexShrink: 0 }}>
+            <div style={{ width: 9, height: 9, background: "#000", borderRadius: 2 }} />
+          </div>
+          <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 13, color: "#fff", letterSpacing: "0.08em", flex: 1 }}>VIBEBLOCK</span>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#375280", padding: 4, display: "flex", alignItems: "center", borderRadius: 4, transition: "color 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#12AAFF"}
+            onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        {/* New Chat */}
+        <div style={{ padding: "10px 12px", flexShrink: 0 }}>
+          <button onClick={() => { onNewChat(); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, background: "#12AAFF14", border: "1px solid #12AAFF30", borderRadius: 8, padding: "9px 14px", cursor: "pointer", color: "#12AAFF", fontSize: 12, fontWeight: 600, transition: "all 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#12AAFF22"; e.currentTarget.style.borderColor = "#12AAFF55"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#12AAFF14"; e.currentTarget.style.borderColor = "#12AAFF30"; }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Chat
+          </button>
+        </div>
+
+        {/* Scrollable content */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+
+          {/* Recents */}
+          <SectionHeader label="Recent" skey="recents" />
+          {expanded.recents && RECENTS.map((r, i) => (
+            <button key={i} onClick={() => { onProject(r); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+              onMouseLeave={e => e.currentTarget.style.background = "none"}
+            >
+              <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1 }}>{r.emoji}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, color: "#c8d8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</div>
+                <div style={{ fontSize: 10, color: "#375280", marginTop: 2 }}>{r.time}</div>
+              </div>
+            </button>
+          ))}
+
+          {/* Projects */}
+          <div style={{ marginTop: 6 }}>
+            <SectionHeader label="Projects" skey="projects" />
+            {expanded.projects && DEMOS.map((d) => (
+              <button key={d.id} onClick={() => { onProject({ demoId: d.id }); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+                onMouseLeave={e => e.currentTarget.style.background = "none"}
+              >
+                <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1 }}>{d.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, color: "#c8d8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.title}</div>
+                  <div style={{ fontSize: 10, color: "#375280", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.tagline}</div>
+                </div>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: d.color, flexShrink: 0, boxShadow: `0 0 5px ${d.color}88` }} />
+              </button>
+            ))}
+          </div>
+
+          {/* Folders */}
+          <div style={{ marginTop: 6, marginBottom: 8 }}>
+            <SectionHeader label="Folders" skey="folders" />
+            {expanded.folders && FOLDERS.map((f, i) => (
+              <button key={i} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "6px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 0.1s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#1e2d4a22"}
+                onMouseLeave={e => e.currentTarget.style.background = "none"}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                <span style={{ flex: 1, fontSize: 12, color: "#c8d8f0" }}>{f.label}</span>
+                <span style={{ fontSize: 10, color: "#375280", background: "#1e2d4a44", borderRadius: 10, padding: "1px 7px" }}>{f.count}</span>
+              </button>
+            ))}
+          </div>
+
+        </div>
+
+        {/* User footer */}
+        <div style={{ padding: "12px 16px", borderTop: "1px solid #1e2d4a", flexShrink: 0, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#12AAFF,#0EA5E9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#000", fontFamily: "'DM Sans',sans-serif" }}>P</span>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, color: "#c8d8f0", fontWeight: 500 }}>pyoonpyoon</div>
+            <div style={{ fontSize: 10, color: "#375280" }}>Arbitrum Hackathon</div>
+          </div>
+          <button style={{ background: "none", border: "none", cursor: "pointer", color: "#375280", padding: 4, display: "flex", alignItems: "center", transition: "color 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#12AAFF"}
+            onMouseLeave={e => e.currentTarget.style.color = "#375280"}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function VibeBlock() {
   const [stage, setStage] = useState("home");
@@ -3205,11 +3339,25 @@ export default function VibeBlock() {
   const [darkMode, setDarkMode] = useState(true);
   const [cliOpen, setCliOpen] = useState(false);
   const [panelHeight, setPanelHeight] = useState(() => Math.round(window.innerHeight * 0.52));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const textareaRef = useRef(null);
 
   Object.assign(T, darkMode ? DARK_T : LIGHT_T);
 
   const reset = () => { setStage("home"); setPrompt(""); setDemoId(null); setProduct(null); setError(null); };
+
+  const loadProject = (item) => {
+    if (item.demoId) {
+      const demo = DEMOS.find(d => d.id === item.demoId);
+      if (demo) startDemo(demo);
+    } else if (item.prompt) {
+      setPrompt(item.prompt);
+      setDemoId(null);
+      setStage("generate");
+    } else {
+      setStage("prompt");
+    }
+  };
 
   const startDemo = (demo) => {
     setDemoId(demo.id);
@@ -3257,8 +3405,19 @@ export default function VibeBlock() {
       {/* Ambient glow */}
       <div style={{ position: "fixed", top: -200, left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse,rgba(18,170,255,0.04),transparent 70%)", pointerEvents: "none" }} />
 
+      <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewChat={() => setStage("prompt")} onProject={loadProject} />
+
       {/* NAV */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: T.navBg, backdropFilter: "blur(20px)", borderBottom: `1px solid ${T.border}`, height: 60, display: "flex", alignItems: "center", padding: "0 28px" }}>
+        {/* Hamburger */}
+        <button onClick={() => setSidebarOpen(o => !o)} title="Open sidebar" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, display: "flex", flexDirection: "column", gap: 4, padding: 4, marginRight: 10, flexShrink: 0, borderRadius: 6, transition: "color 0.15s" }}
+          onMouseEnter={e => e.currentTarget.style.color = T.accent}
+          onMouseLeave={e => e.currentTarget.style.color = T.textMuted}
+        >
+          <span style={{ display: "block", width: 16, height: 1.5, background: "currentColor", borderRadius: 1 }} />
+          <span style={{ display: "block", width: 16, height: 1.5, background: "currentColor", borderRadius: 1 }} />
+          <span style={{ display: "block", width: 16, height: 1.5, background: "currentColor", borderRadius: 1 }} />
+        </button>
         {/* Logo */}
         <button onClick={reset} style={{ display: "flex", alignItems: "center", gap: 9, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}>
           <div style={{ width: 28, height: 28, background: T.accent, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 12px ${T.accent}55` }}>
