@@ -1825,80 +1825,97 @@ const DEPLOY_DATA = {
 function DeployPanel({ demoType }) {
   const [phase, setPhase] = useState("idle");
   const [walletAddr, setWalletAddr] = useState(null);
-  const [networkOk, setNetworkOk] = useState(false);
   const [txHash, setTxHash] = useState(null);
-  const [contractAddr, setContractAddr] = useState(null);
   const [errMsg, setErrMsg] = useState(null);
 
-  const ARB_CHAIN = 421614n;
-  const ARB_HEX   = "0x66eee";
-  const SCAN      = "https://sepolia.arbiscan.io";
-  const short     = (a) => a ? `${a.slice(0,6)}...${a.slice(-4)}` : "";
+  const SCAN  = "https://sepolia.arbiscan.io";
+  const short = (a) => a ? `${a.slice(0,6)}...${a.slice(-4)}` : "";
 
   const friendlyErr = (msg = "") => {
+    if (/notallowed|not allowed|user cancel|abort|touch id|fingerprint/i.test(msg))
+      return "Touch ID cancelled. Tap SHIP to try again.";
     if (/max fee per gas|base fee|insufficient funds|gas/i.test(msg))
-      return "Not enough ETH for gas. Get free testnet ETH from the Arbitrum Sepolia faucet, then try again.";
-    if (/user rejected|user denied|rejected the request/i.test(msg))
-      return "Transaction cancelled. Hit Deploy when you're ready to sign.";
+      return "Gas error — the paymaster may be unavailable. Try again in a moment.";
     if (/network|chain|wrong/i.test(msg))
-      return "Wrong network. Switch your wallet to Arbitrum Sepolia and try again.";
-    if (/nonce/i.test(msg))
-      return "Transaction conflict. Reset your wallet's activity data and try again.";
-    return "Something went wrong. Check your wallet is on Arbitrum Sepolia and has ETH, then try again.";
+      return "Network error. Check your connection and try again.";
+    return "Something went wrong. Check your connection and try again.";
   };
 
-  async function connect() {
-    if (!window.ethereum) { setErrMsg("No wallet found. Install a wallet (e.g. Rabby or MetaMask) to deploy."); setPhase("err"); return; }
-    setPhase("connecting"); setErrMsg(null);
+  async function ship() {
+    setPhase("shipping"); setErrMsg(null);
     try {
-      const { ethers } = await import("https://esm.sh/ethers@6");
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const addr = await signer.getAddress();
-      const net  = await provider.getNetwork();
-      setWalletAddr(addr);
-      setNetworkOk(net.chainId === ARB_CHAIN);
-      setPhase("connected");
-    } catch(e) { setErrMsg(e.message?.slice(0, 120) || "Connection failed"); setPhase("err"); }
-  }
+      const {
+        createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient,
+        KERNEL_V3_1, toPasskeyValidator, toWebAuthnKey, WebAuthnMode,
+        http, createPublicClient, arbitrumSepolia,
+      } = await import("virtual:zerodev");
 
-  async function switchNetwork() {
-    setPhase("switching");
-    try {
-      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARB_HEX }] });
-      setNetworkOk(true); setPhase("connected");
-    } catch(e) {
-      if (e.code === 4902) {
-        try {
-          await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: ARB_HEX, chainName: "Arbitrum Sepolia", nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"], blockExplorerUrls: [SCAN] }] });
-          setNetworkOk(true); setPhase("connected");
-        } catch(e2) { setErrMsg(e2.message?.slice(0, 120)); setPhase("err"); }
-      } else { setErrMsg(e.message?.slice(0, 120)); setPhase("err"); }
-    }
-  }
+      const PROJECT_ID    = "3d2c3f70-57d9-4c74-bdcb-eb3fb94b7dbb";
+      const BUNDLER_RPC   = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/421614`;
+      const PASSKEY_SERVER = `https://passkeys.zerodev.app/api/v3/${PROJECT_ID}`;
+      const ENTRY_POINT   = { address: "0x0000000071727De22E5E9d8BAf0edAc6f37da032", version: "0.7" };
 
-  async function deployContract() {
-    setPhase("deploying"); setErrMsg(null);
-    try {
-      const { ethers } = await import("https://esm.sh/ethers@6");
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer   = await provider.getSigner();
-      const deployer = await signer.getAddress();
-      const d    = DEPLOY_DATA[demoType] || DEPLOY_DATA.marketplace;
-      const args = d.args(deployer);
-      const factory  = new ethers.ContractFactory(d.abi, d.bytecode, signer);
-      const feeData  = await provider.getFeeData();
-      const contract = await factory.deploy(...args, {
-        maxFeePerGas: feeData.maxFeePerGas * 2n,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? ethers.parseUnits("0.001", "gwei"),
+      const publicClient = createPublicClient({ transport: http(BUNDLER_RPC), chain: arbitrumSepolia });
+
+      const webAuthnKey = await toWebAuthnKey({
+        passkeyName: "VibeBlock",
+        passkeyServerUrl: PASSKEY_SERVER,
+        mode: WebAuthnMode.Register,
+        rpID: window.location.hostname,
       });
-      setTxHash(contract.deploymentTransaction().hash);
+
+      const passkeyValidator = await toPasskeyValidator(publicClient, {
+        webAuthnKey,
+        entryPoint: ENTRY_POINT,
+        kernelVersion: KERNEL_V3_1,
+      });
+
+      const account = await createKernelAccount(publicClient, {
+        plugins: { sudo: passkeyValidator },
+        entryPoint: ENTRY_POINT,
+        kernelVersion: KERNEL_V3_1,
+      });
+
+      setWalletAddr(account.address);
+      setPhase("deploying");
+
+      const paymasterClient = createZeroDevPaymasterClient({
+        chain: arbitrumSepolia,
+        transport: http(BUNDLER_RPC),
+      });
+
+      const kernelClient = createKernelAccountClient({
+        account,
+        chain: arbitrumSepolia,
+        bundlerTransport: http(BUNDLER_RPC),
+        paymaster: paymasterClient,
+      });
+
+      const d    = DEPLOY_DATA[demoType] || DEPLOY_DATA.marketplace;
+      const hash = await kernelClient.deployContract({
+        abi: d.abi,
+        bytecode: d.bytecode,
+        args: d.args(account.address),
+      });
+
+      setTxHash(hash);
       setPhase("pending");
-      await contract.waitForDeployment();
-      setContractAddr(await contract.getAddress());
+
+      // hash may be a userOp hash — resolve to the actual tx hash via receipt
+      try {
+        const opReceipt = await kernelClient.waitForUserOperationReceipt({ hash });
+        setTxHash(opReceipt.receipt.transactionHash);
+      } catch {
+        await publicClient.waitForTransactionReceipt({ hash });
+      }
+
       setPhase("done");
-    } catch(e) { setErrMsg(friendlyErr(e.message)); setPhase("connected"); }
+    } catch(e) {
+      const raw = e?.message || String(e);
+      console.error("[SHIP]", e);
+      setErrMsg(raw.slice(0, 300));
+      setPhase("idle");
+    }
   }
 
   const d = DEPLOY_DATA[demoType] || DEPLOY_DATA.marketplace;
@@ -1906,10 +1923,10 @@ function DeployPanel({ demoType }) {
   if (phase === "done") return (
     <div style={{ background: "rgba(0,200,5,0.06)", border: "1px solid rgba(0,200,5,0.2)", borderRadius: 12, padding: 20 }}>
       <div style={{ fontSize: 10, color: T.green, letterSpacing: "0.1em", marginBottom: 14, fontWeight: 700 }}>CONTRACT DEPLOYED ✓</div>
-      <div style={{ fontSize: 11, color: T.textDim, marginBottom: 4, fontFamily: "'DM Mono',monospace" }}>CONTRACT ADDRESS</div>
-      <div style={{ fontSize: 11, color: T.accent, fontFamily: "'DM Mono',monospace", wordBreak: "break-all", marginBottom: 14 }}>{contractAddr}</div>
-      <a href={`${SCAN}/address/${contractAddr}`} target="_blank" rel="noreferrer" style={{ display: "block", textAlign: "center", color: T.accent, fontSize: 12, textDecoration: "none", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 7, padding: "10px 0", marginBottom: 8, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>View on Arbiscan →</a>
-      <a href={`${SCAN}/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ display: "block", textAlign: "center", color: T.textDim, fontSize: 10, textDecoration: "none" }}>Deploy tx: {short(txHash)}</a>
+      {walletAddr && <div style={{ fontSize: 11, color: T.textDim, marginBottom: 4, fontFamily: "'DM Mono',monospace" }}>Smart wallet: {short(walletAddr)}</div>}
+      <div style={{ fontSize: 10, color: T.textDim, marginBottom: 14 }}>Gas: $0.00 — sponsored</div>
+      <a href={`${SCAN}/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ display: "block", textAlign: "center", color: T.accent, fontSize: 12, textDecoration: "none", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 7, padding: "10px 0", marginBottom: 8, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>View on Arbiscan →</a>
+      <div style={{ fontSize: 10, color: T.textDim, textAlign: "center" }}>Deploy tx: {short(txHash)}</div>
     </div>
   );
 
@@ -1918,49 +1935,38 @@ function DeployPanel({ demoType }) {
       <div style={{ fontSize: 10, color: T.textDim, letterSpacing: "0.1em", marginBottom: 14 }}>DEPLOY TO TESTNET</div>
       <div style={{ textAlign: "center", padding: "16px 0" }}>
         <div style={{ fontSize: 13, color: T.text, marginBottom: 10 }}>⏳ Confirming on-chain...</div>
-        <a href={`${SCAN}/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 11, textDecoration: "none", border: `1px solid ${T.accentBorder}`, borderRadius: 6, padding: "6px 14px" }}>View tx on Arbiscan →</a>
+        {txHash && <a href={`${SCAN}/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 11, textDecoration: "none", border: `1px solid ${T.accentBorder}`, borderRadius: 6, padding: "6px 14px" }}>View tx on Arbiscan →</a>}
       </div>
+    </div>
+  );
+
+  if (phase === "deploying") return (
+    <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: 20 }}>
+      <div style={{ fontSize: 10, color: T.textDim, letterSpacing: "0.1em", marginBottom: 14 }}>DEPLOY TO TESTNET</div>
+      <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 7, padding: "8px 12px", marginBottom: 10 }}>
+        <div style={{ fontSize: 9, color: T.textDim, letterSpacing: "0.08em" }}>SMART WALLET</div>
+        <div style={{ fontSize: 11, color: T.text, fontFamily: "'DM Mono',monospace" }}>{short(walletAddr)}</div>
+      </div>
+      <button disabled style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: "not-allowed", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: 0.6 }}>
+        Deploying...
+      </button>
+      <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Arbitrum Sepolia · Gas: $0.00 — sponsored</div>
     </div>
   );
 
   return (
     <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: 20 }}>
       <div style={{ fontSize: 10, color: T.textDim, letterSpacing: "0.1em", marginBottom: 14 }}>DEPLOY TO TESTNET</div>
-      {(phase === "idle" || phase === "connecting" || phase === "err") && (
-        <>
-          <button onClick={connect} disabled={phase === "connecting"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "connecting" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "connecting" ? 0.6 : 1 }}>
-            {phase === "connecting" ? "Connecting..." : "Connect Wallet"}
-          </button>
-          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Wallet required — deploying {d.name} to Arbitrum Sepolia</div>
-        </>
-      )}
-      {(phase === "connected" || phase === "switching" || phase === "deploying") && (
-        <>
-          <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 7, padding: "8px 12px", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: 9, color: T.textDim, letterSpacing: "0.08em" }}>WALLET</div>
-              <div style={{ fontSize: 11, color: T.text, fontFamily: "'DM Mono',monospace" }}>{short(walletAddr)}</div>
-            </div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: networkOk ? T.green : T.amber }}>
-              {networkOk ? "✓ Arb Sepolia" : "⚠ Wrong Network"}
-            </div>
-          </div>
-          {!networkOk ? (
-            <button onClick={switchNetwork} disabled={phase === "switching"} style={{ width: "100%", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "12px 0", color: T.amber, fontSize: 12, fontWeight: 800, cursor: phase === "switching" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "switching" ? 0.6 : 1 }}>
-              {phase === "switching" ? "Switching..." : "Switch to Arbitrum Sepolia"}
-            </button>
-          ) : (
-            <button onClick={deployContract} disabled={phase === "deploying"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "deploying" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "deploying" ? 0.6 : 1 }}>
-              {phase === "deploying" ? "Confirm in wallet..." : `Deploy ${d.name} →`}
-            </button>
-          )}
-          <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>Arbitrum Sepolia testnet · chain ID 421614</div>
-        </>
-      )}
+      <button onClick={ship} disabled={phase === "shipping"} style={{ width: "100%", background: T.accentGlow, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: "12px 0", color: T.accent, fontSize: 12, fontWeight: 800, cursor: phase === "shipping" ? "not-allowed" : "pointer", fontFamily: "'Syne',sans-serif", letterSpacing: "0.08em", opacity: phase === "shipping" ? 0.6 : 1 }}>
+        {phase === "shipping" ? "Touch to confirm..." : "SHIP"}
+      </button>
+      <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, textAlign: "center" }}>
+        {phase === "shipping" ? "Waiting for fingerprint..." : `Deploy ${d.name} → Arbitrum Sepolia`}
+      </div>
       {errMsg && (
         <div style={{ fontSize: 11, color: T.red, marginTop: 10, padding: "8px 10px", background: "rgba(239,68,68,0.07)", borderRadius: 6, border: "1px solid rgba(239,68,68,0.15)" }}>
           {errMsg}
-          <button onClick={() => { setPhase("idle"); setErrMsg(null); }} style={{ display: "block", marginTop: 6, background: "none", border: "none", color: T.accent, cursor: "pointer", fontSize: 11, padding: 0 }}>Try again</button>
+          <button onClick={() => setErrMsg(null)} style={{ display: "block", marginTop: 6, background: "none", border: "none", color: T.accent, cursor: "pointer", fontSize: 11, padding: 0 }}>Dismiss</button>
         </div>
       )}
     </div>
